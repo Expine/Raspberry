@@ -14,7 +14,12 @@ public class TaskManager {
 	/** タスクのリスト */
 	private ArrayList<Task> tasks = new ArrayList<Task>();
 	
-	private TaskManager(){}
+	private TaskManager(){
+		for(int i = 0; i < 10; ++i) {
+			Task t = new Task(i, "Name" + i, new ArrayList<Tag>(), new Date(1000));
+			tasks.add(t);
+		}
+	}
 
 	/**
 	 * インスタンス取得
