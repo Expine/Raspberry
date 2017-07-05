@@ -20,10 +20,12 @@ public class TaskManager {
 	
 	private TaskManager(){
 		for(int i = 0; i < 10; ++i) {
-			Task t = new Task("Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i, new Time(0), new Time(2000), 0);
+			Task t = new Task("Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i, new Time(2000), 0);
 			tasks.put(t.getID(), t);
 		}
 	}
+	
+	
 
 	/**
 	 * インスタンス取得
@@ -101,8 +103,5 @@ public class TaskManager {
 	 */
 	public Time getEstimatedTime(ArrayList<Tag> tags) {
 		return new Time(1000);
-	}
-	
-	
-	
+	}	
 }

@@ -29,18 +29,43 @@ public class Task {
 	/* タスクの終了予想時間 */
 	private Time scheduledTime;
 
+	/** 繰り返し間隔 */
+	private int loopInterval;
+
 	/** 一つのタスクの重み*/
 	private float weight;
+	/** チェックポイントの説明 */
 	private String checkPointExp;
 	
 	
-	private int loopInterval;
 	
-	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, int loopInterval) {
-		this(name, tags, start, limit, explanation, elapsedTime, scheduledTime, loopInterval, 1.0f, "");
+	/**
+	 * コンストラクタ(連続しないタスク)
+	 * @param name タスクの登録名
+	 * @param tags タスクに登録されたタグ
+	 * @param start　タスクを登録した日時
+	 * @param limit　タスクの期限 
+	 * @param explanation　タスクの説明
+	 * @param scheduledTime タスクの終了予想時間 
+	 * @param loopInterval 繰り返し間隔
+	 */
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time scheduledTime, int loopInterval) {
+		this(name, tags, start, limit, explanation, scheduledTime, loopInterval, 1.0f, "");
 	}
 
-	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, int loopInterval, float weight, String checkPointExp) {
+	/**
+	 * コンストラクタ(連続するタスク)
+	 * @param name タスクの登録名
+	 * @param tags タスクに登録されたタグ
+	 * @param start　タスクを登録した日時
+	 * @param limit　タスクの期限 
+	 * @param explanation　タスクの説明
+	 * @param scheduledTime タスクの終了予想時間 
+	 * @param loopInterval 繰り返し間隔
+	 * @param weight 一つのタスクの重み
+	 * @param checkPointExp チェックポイントの説明
+	 */
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time scheduledTime, int loopInterval, float weight, String checkPointExp) {
 		this.ID = startID++;
 		this.name = name;
 		this.tags = tags;
@@ -49,7 +74,6 @@ public class Task {
 		this.weight = weight;
 		this.explanation = explanation;
 		this.checkPointExp = checkPointExp;
-		this.elapsedTime = elapsedTime;
 		this.scheduledTime = scheduledTime;
 		this.loopInterval = loopInterval;
 	}
