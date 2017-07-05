@@ -16,7 +16,7 @@ public class TaskManager {
 	
 	private TaskManager(){
 		for(int i = 0; i < 10; ++i) {
-			Task t = new Task(i, "Name" + i, new ArrayList<Tag>(), new Date(1000));
+			Task t = new Task(i, "Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i);
 			tasks.add(t);
 		}
 	}
@@ -47,14 +47,14 @@ public class TaskManager {
 	}
 	
 	/**
-	 * ある日付のタスクを取得する
+	 * ある日付を含むタスクを取得する
 	 * @param d 取得する日付
 	 * @return ある日付をもったタスクのリスト
 	 */
 	public ArrayList<Task> getTask(Date d) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for(Task task : tasks)
-			if(task.getDate().equals(d))
+			if(task.getStart().after(d) && task.getLimit().before(d))
 				result.add(task);		
 		return result;
 	}

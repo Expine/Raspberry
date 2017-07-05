@@ -12,13 +12,27 @@ public class Task {
 	private int ID;
 	private String name;
 	private ArrayList<Tag> tags;
-	private Date date;
-	public Task(int ID, String name, ArrayList<Tag> tags, Date date) {
+	private Date start;
+	private Date limit;
+	private float weight;
+	private String explanation;
+	private String checkPointExp;
+	
+	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation) {
+		this(ID, name, tags, start, limit, explanation, 0.0f, "");
+	}
+
+	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, float weight, String checkPointExp) {
 		this.ID = ID;
 		this.name = name;
 		this.tags = tags;
-		this.date = date;
+		this.start = start;
+		this.limit = limit;
+		this.weight = weight;
+		this.explanation = explanation;
+		this.checkPointExp = checkPointExp;
 	}
+
 	public int getID() {
 		return ID;
 	}
@@ -28,7 +42,23 @@ public class Task {
 	public ArrayList<Tag> getTags() {
 		return tags;
 	}
-	public Date getDate() {
-		return date;
+	public Date getStart() {
+		return start;
 	}
+	
+	public Date getLimit() {
+		return limit;
+	}
+
+	public float getWeight() {
+		return weight;
+	}
+
+	public String getExplanation() {
+		return explanation;
+	}
+
+	public String getCheckPointExp() {
+		return checkPointExp;
+	}	
 }
