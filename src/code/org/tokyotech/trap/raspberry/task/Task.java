@@ -1,5 +1,6 @@
 package code.org.tokyotech.trap.raspberry.task;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,11 +19,14 @@ public class Task {
 	private String explanation;
 	private String checkPointExp;
 	
-	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation) {
-		this(ID, name, tags, start, limit, explanation, 0.0f, "");
+	private Time elapsedTime;
+	private Time scheduledTime;
+	
+	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime) {
+		this(ID, name, tags, start, limit, explanation, elapsedTime, scheduledTime, 0.0f, "");
 	}
 
-	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, float weight, String checkPointExp) {
+	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, float weight, String checkPointExp) {
 		this.ID = ID;
 		this.name = name;
 		this.tags = tags;
@@ -31,6 +35,8 @@ public class Task {
 		this.weight = weight;
 		this.explanation = explanation;
 		this.checkPointExp = checkPointExp;
+		this.elapsedTime = elapsedTime;
+		this.scheduledTime = scheduledTime;
 	}
 
 	public int getID() {
@@ -60,5 +66,13 @@ public class Task {
 
 	public String getCheckPointExp() {
 		return checkPointExp;
+	}
+
+	public Time getElapsedTime() {
+		return elapsedTime;
+	}
+
+	public Time getScheduledTime() {
+		return scheduledTime;
 	}	
 }
