@@ -15,6 +15,8 @@ public class TaskManager {
 	private TaskManager instance = new TaskManager();
 	/** タスクのリスト */
 	private HashMap<Integer, Task> tasks = new HashMap<Integer, Task>();
+	/** クローズするタスクのリスト */
+	private HashMap<Integer, Task> closeTasks = new HashMap<Integer, Task>();
 	
 	private TaskManager(){
 		for(int i = 0; i < 10; ++i) {
@@ -36,7 +38,7 @@ public class TaskManager {
 	 * @param task 追加するタスク
 	 */
 	public void addTask(Task task) {
-		tasks.add(task);
+		tasks.put(task.getID(), task);
 	}
 
 	/**
@@ -73,9 +75,24 @@ public class TaskManager {
 				result.add(task);		
 		return result;
 	}
-	
+
+	/**
+	 * 進捗してタスクに時間を追加する
+	 * @param ID 追加するタスクのID
+	 * @param time 進捗した時間
+	 */
 	public void progress(int ID, Time time) {
 		tasks.get(ID).addTime(time);
+	}
+	
+	/**
+	 * タスクをクローズする
+	 * @param ID
+	 */
+	public void closeTask(int ID) {
+		Task task = tasks.get(ID);
+		tasks.remove(task);
+		closeTasks.put(task.getID(), task);
 	}
 
 	/**
@@ -85,5 +102,7 @@ public class TaskManager {
 	public Time getEstimatedTime(ArrayList<Tag> tags) {
 		return new Time(1000);
 	}
+	
+	
 	
 }
