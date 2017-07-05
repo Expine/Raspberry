@@ -47,7 +47,11 @@ public class TaskManager {
 	 * @return ある日付をもったタスクのリスト
 	 */
 	public ArrayList<Task> getTask(Date d) {
-		return new ArrayList<Task>();
+		ArrayList<Task> result = new ArrayList<Task>();
+		for(Task task : tasks)
+			if(task.getDate().equals(d))
+				result.add(task);		
+		return result;
 	}
 
 	/**
@@ -56,7 +60,11 @@ public class TaskManager {
 	 * @return あるタグをもったタスクのリスト
 	 */
 	public ArrayList<Task> getTask(Tag t) {
-		return new ArrayList<Task>();
+		ArrayList<Task> result = new ArrayList<Task>();
+		for(Task task : tasks)
+			if(task.getTags().contains(t))
+				result.add(task);		
+		return result;
 	}
 	
 }

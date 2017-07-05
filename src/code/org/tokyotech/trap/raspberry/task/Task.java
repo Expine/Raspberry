@@ -19,4 +19,16 @@ public class Task {
 		this.tags = tags;
 		this.date = date;
 	}
+	public int getID() {
+		return ID;
+	}
+	public String getName() {
+		return name;
+	}
+	public ArrayList<Tag> getTags() {
+		return tags;
+	}
+	public Date getDate() {
+		return date;
+	}
 }
