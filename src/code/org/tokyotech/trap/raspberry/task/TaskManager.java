@@ -1,5 +1,6 @@
 package code.org.tokyotech.trap.raspberry.task;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class TaskManager {
 	
 	private TaskManager(){
 		for(int i = 0; i < 10; ++i) {
-			Task t = new Task(i, "Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i);
+			Task t = new Task("Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i, new Time(0), new Time(2000));
 			tasks.add(t);
 		}
 	}

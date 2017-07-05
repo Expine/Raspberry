@@ -10,6 +10,7 @@ import java.util.Date;
  * @since 2017/7/5
  */
 public class Task {
+	static int startID = 0;
 	private int ID;
 	private String name;
 	private ArrayList<Tag> tags;
@@ -22,12 +23,12 @@ public class Task {
 	private Time elapsedTime;
 	private Time scheduledTime;
 	
-	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime) {
-		this(ID, name, tags, start, limit, explanation, elapsedTime, scheduledTime, 0.0f, "");
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime) {
+		this(name, tags, start, limit, explanation, elapsedTime, scheduledTime, 0.0f, "");
 	}
 
-	public Task(int ID, String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, float weight, String checkPointExp) {
-		this.ID = ID;
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, float weight, String checkPointExp) {
+		this.ID = startID++;
 		this.name = name;
 		this.tags = tags;
 		this.start = start;
