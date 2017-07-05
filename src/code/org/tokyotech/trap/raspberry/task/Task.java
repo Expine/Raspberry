@@ -10,24 +10,37 @@ import java.util.Date;
  * @since 2017/7/5
  */
 public class Task {
+	/** 次に登録するタスクのID */
 	static int startID = 0;
+	/**　タスクのID */
 	private int ID;
+	/** タスクの登録名 */
 	private String name;
+	/** タスクに登録されたタグ*/
 	private ArrayList<Tag> tags;
+	/** タスクを登録した日時 */
 	private Date start;
+	/** タスクの期限 */
 	private Date limit;
-	private float weight;
+	/* タスクの説明 */
 	private String explanation;
+	/* タスクの進捗時間 */
+	private Time elapsedTime;
+	/* タスクの終了予想時間 */
+	private Time scheduledTime;
+
+	/** 一つのタスクの重み*/
+	private float weight;
 	private String checkPointExp;
 	
-	private Time elapsedTime;
-	private Time scheduledTime;
 	
-	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime) {
-		this(name, tags, start, limit, explanation, elapsedTime, scheduledTime, 0.0f, "");
+	private int loopInterval;
+	
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, int loopInterval) {
+		this(name, tags, start, limit, explanation, elapsedTime, scheduledTime, loopInterval, 1.0f, "");
 	}
 
-	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, float weight, String checkPointExp) {
+	public Task(String name, ArrayList<Tag> tags, Date start, Date limit, String explanation, Time elapsedTime, Time scheduledTime, int loopInterval, float weight, String checkPointExp) {
 		this.ID = startID++;
 		this.name = name;
 		this.tags = tags;
@@ -38,6 +51,7 @@ public class Task {
 		this.checkPointExp = checkPointExp;
 		this.elapsedTime = elapsedTime;
 		this.scheduledTime = scheduledTime;
+		this.loopInterval = loopInterval;
 	}
 
 	public int getID() {
@@ -76,4 +90,12 @@ public class Task {
 	public Time getScheduledTime() {
 		return scheduledTime;
 	}	
+	
+	public int getLoopInterval() {
+		return loopInterval;
+	}
+	
+	public void addTime(Time t) {
+		elapsedTime.setTime(elapsedTime.getTime() + t.getTime());
+	}
 }
