@@ -1,5 +1,14 @@
 package code.org.tokyotech.trap.raspberry.task;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,26 +21,66 @@ import java.util.HashMap;
  */
 public class TaskManager {
 	/**　シングルトン管理のインスタンス */
-	private TaskManager instance = new TaskManager();
+	private static TaskManager instance = new TaskManager();
 	/** タスクのリスト */
 	private HashMap<Integer, Task> tasks = new HashMap<Integer, Task>();
 	/** クローズするタスクのリスト */
 	private HashMap<Integer, Task> closeTasks = new HashMap<Integer, Task>();
 	
 	private TaskManager(){
+//		loadTaskData();
 		for(int i = 0; i < 10; ++i) {
 			Task t = new Task("Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i, new Time(2000), 0);
 			tasks.put(t.getID(), t);
 		}
 	}
 	
+	private void loadTaskData() {		
+		// Check file
+		if(!(new File("./config").exists()))
+			new File("./config").mkdirs();
+
+		String line = null;
+		try {
+			if(new File("./config/.task").exists()) {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./config/.task"));
+				tasks = (HashMap<Integer, Task>)ois.readObject();		
+				ois.close();				
+			}
+
+			if(new File("./config/.old").exists()) {
+				ObjectInputStream ois =new ObjectInputStream(new FileInputStream("./config/.old"));
+				closeTasks = (HashMap<Integer, Task>)ois.readObject();		
+				ois.close();				
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	
+	public void saveTaskData() {
+		// Check file
+		if(!(new File("./config").exists()))
+			new File("./config").mkdirs();
+
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./config/.task"));
+			oos.writeObject(tasks);
+			oos.close();
+			oos = new ObjectOutputStream(new FileOutputStream("./config/.old"));
+			oos.writeObject(closeTasks);
+			oos.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * インスタンス取得
 	 * @return TaskManagerのインスタンス
 	 */
-	public TaskManager instance() {
+	public static TaskManager instance() {
 		return instance;
 	}
 	

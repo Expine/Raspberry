@@ -1,4 +1,4 @@
-package code.org.tokyotech.trap.raspberry.config;
+	package code.org.tokyotech.trap.raspberry.config;
 
 import javax.swing.JDialog;
 

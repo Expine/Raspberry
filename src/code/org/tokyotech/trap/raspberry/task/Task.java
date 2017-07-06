@@ -1,5 +1,6 @@
 package code.org.tokyotech.trap.raspberry.task;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.Date;
  * @author yuu
  * @since 2017/7/5
  */
-public class Task {
+public class Task implements Serializable {
 	/** 次に登録するタスクのID */
 	static int startID = 0;
 	/**　タスクのID */
