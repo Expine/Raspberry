@@ -26,6 +26,8 @@ public class TaskManager {
 	private HashMap<Integer, Task> tasks = new HashMap<Integer, Task>();
 	/** クローズするタスクのリスト */
 	private HashMap<Integer, Task> closeTasks = new HashMap<Integer, Task>();
+	/** これまで付けたタグのリスト */
+	private ArrayList<Tag> tagList = new ArrayList<Tag>();
 	
 	private TaskManager(){
 //		loadTaskData();
@@ -56,6 +58,12 @@ public class TaskManager {
 				closeTasks = (HashMap<Integer, Task>)ois.readObject();		
 				ois.close();				
 			}
+
+			if(new File("./config/.tag").exists()) {
+				ObjectInputStream ois =new ObjectInputStream(new FileInputStream("./config/.tag"));
+				tagList = (ArrayList<Tag>)ois.readObject();		
+				ois.close();
+			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -76,7 +84,9 @@ public class TaskManager {
 			oos = new ObjectOutputStream(new FileOutputStream("./config/.old"));
 			oos.writeObject(closeTasks);
 			oos.close();
-			
+			oos = new ObjectOutputStream(new FileOutputStream("./config/.tag"));
+			oos.writeObject(tagList);
+			oos.close();			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -96,6 +106,19 @@ public class TaskManager {
 	 */
 	public void addTask(Task task) {
 		tasks.put(task.getID(), task);
+
+		// 付けたことのないタグならばリストに追加
+		for(Tag t : task.getTags())
+			if(!tagList.contains(t))
+				tagList.add(t);
+	}
+
+	/**
+	 * これまで付けたことのあるタグを消す
+	 * @param tag 消すタグ
+	 */
+	public void removeTag(Tag tag) {
+		tagList.remove(tag);
 	}
 
 	/**
