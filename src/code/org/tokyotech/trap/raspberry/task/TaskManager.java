@@ -35,6 +35,9 @@ public class TaskManager {
 		}
 	}
 	
+	/**
+	 * タスクデータを読み込む
+	 */
 	private void loadTaskData() {		
 		// Check file
 		if(!(new File("./config").exists()))
@@ -58,6 +61,9 @@ public class TaskManager {
 		}
 	}
 	
+	/**
+	 * タスクのデータを保存する
+	 */
 	public void saveTaskData() {
 		// Check file
 		if(!(new File("./config").exists()))
@@ -151,6 +157,78 @@ public class TaskManager {
 	 * @return 推定時間
 	 */
 	public Time getEstimatedTime(ArrayList<Tag> tags) {
-		return new Time(1000);
+		long result = 0L;
+		for(Tag t : tags)
+			result += calculateTime(t).getTime();
+		return new Time(tags.size() == 0 ? 0 : result / tags.size());
 	}	
+	
+	/**
+	 * あるタグの推定時間を計算する
+	 * @param tag 推定時間を計算するタグ
+	 * @return 計算された推定時間
+	 */
+	private Time calculateTime(Tag tag) {
+		double count = 0.0;
+		double time = 0.0;
+		ArrayList<WeightedTask> weightedTasks = new ArrayList<WeightedTask>();
+		for(Task task : closeTasks.values())
+			for(Tag t : task.getTags())
+				if(t.getTag().equals(tag.getTag()))
+					weightedTasks.add(new WeightedTask(task, 1.0f));
+				else
+					weightedTasks.add(new WeightedTask(task, 1.0f - (float)calculateLevenshteinDistance(t.getTag(), tag.getTag()) / Math.min(t.getTag().length(), tag.getTag().length())));
+		for(WeightedTask wt : weightedTasks) {
+			time += (double)wt.task.getElapsedTime().getTime() * wt.weight;
+			count += wt.weight;
+		}
+		
+		return new Time((long)(time / count));
+	}
+	
+	/**
+	 * レーベンシュタイン距離を求める
+	 * ただし、挿入および削除は距離に含まないとする
+	 * @param s1 比較対象の文字列 
+	 * @param s2 比較対象の文字列 
+	 * @return レーベンシュタイン距離
+	 */
+	private int calculateLevenshteinDistance(String s1, String s2) {
+		char[] str1 = s1.toCharArray();
+		char[] str2 = s2.toCharArray();
+		
+		int table[][] = new int[str1.length + 1][str2.length + 1];
+		for(int i = 0; i < str1.length + 1; ++i)
+			table[i][0] = i;
+		for(int i = 0; i < str2.length + 1; ++i)
+			table[0][i] = i;
+		
+		int cost;
+		for(int i = 1; i < str1.length + 1; ++i)
+			for(int j = 1; j < str2.length + 1; ++j) {
+				cost = str1[i] == str2[j] ? 0 : 1;
+				//
+				table[i][j] = Math.min(
+						table[i - 1][j], // 挿入
+				Math.min(
+						table[i][j - 1], // 削除
+						table[i - 1][j - 1] + cost));	// 置換
+			}
+		return table[str1.length][str2.length];
+	}
+	
+	/**
+	 * タスクに重みを付けたデータクラス
+	 * @author yuu
+	 */
+	private class WeightedTask {
+		/** タグ */
+		private Task task;
+		/** 重み */
+		private float weight;
+		public WeightedTask(Task task, float weight) {
+			this.task = task;
+			this.weight = weight;
+		}		
+	}
 }
