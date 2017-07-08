@@ -7,5 +7,6 @@ import javax.swing.JPanel;
 public class CalendarPanel extends JPanel {
 	public CalendarPanel() {
 		setPreferredSize(new Dimension(800, 600));
+		AddTaskDialog dlg = new AddTaskDialog();
 	}
 }
