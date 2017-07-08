@@ -1,10 +1,12 @@
 package code.org.tokyotech.trap.raspberry.task;
 
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Time;
@@ -103,6 +105,7 @@ public class TaskManager {
 	 * @param task 追加するタスク
 	 */
 	public void addTask(Task task) {
+		System.out.println("po");
 		tasks.put(task.getID(), task);
 
 		// 付けたことのないタグならばリストに追加
@@ -155,14 +158,6 @@ public class TaskManager {
 	}
 
 	/**
-	 * 昔付けたタグのリストを返す
-	 * @return 昔付けたタグのリスト
-	 */
-	public ArrayList<Tag> getTagList() {
-		return tagList;
-	}
-
-	/**
 	 * 進捗してタスクに時間を追加する
 	 * @param ID 追加するタスクのID
 	 * @param time 進捗した時間
@@ -203,7 +198,10 @@ public class TaskManager {
 		ArrayList<WeightedTask> weightedTasks = new ArrayList<WeightedTask>();
 		for(Task task : closeTasks.values())
 			for(Tag t : task.getTags())
-				weightedTasks.add(new WeightedTask(task, calculateWeight(t, tag)));
+				if(t.getTag().equals(tag.getTag()))
+					weightedTasks.add(new WeightedTask(task, 1.0f));
+				else
+					weightedTasks.add(new WeightedTask(task, 1.0f - (float)calculateLevenshteinDistance(t.getTag(), tag.getTag()) / Math.min(t.getTag().length(), tag.getTag().length())));
 		for(WeightedTask wt : weightedTasks) {
 			time += (double)wt.task.getElapsedTime().getTime() * wt.weight;
 			count += wt.weight;
@@ -213,22 +211,8 @@ public class TaskManager {
 	}
 	
 	/**
-	 * 二つのタグの親和性を計測し、重みを返す
-	 * @param t1 計測するタグ
-	 * @param t2 計測するタグ
-	 * @return 重み
-	 */
-	private float calculateWeight(Tag t1, Tag t2) {
-		String s1 = t1.getTag();
-		String s2 = t2.getTag();
-		float ld = calculateLevenshteinDistance(s1, s2);
-		float d = Math.abs(s1.length() - s2.length());
-		float ms = Math.max(s1.length(), s2.length());
-		return 1.0f - ld / ms + (ld == d && ld > 0 ? d / ms - 0.5f / d : 0.0f);
-	}
-	
-	/**
 	 * レーベンシュタイン距離を求める
+	 * ただし、挿入および削除は距離に含まないとする
 	 * @param s1 比較対象の文字列 
 	 * @param s2 比較対象の文字列 
 	 * @return レーベンシュタイン距離
@@ -246,16 +230,16 @@ public class TaskManager {
 		int cost;
 		for(int i = 1; i < str1.length + 1; ++i)
 			for(int j = 1; j < str2.length + 1; ++j) {
-				cost = str1[i - 1] == str2[j - 1] ? 0 : 1;
+				cost = str1[i] == str2[j] ? 0 : 1;
 				//
 				table[i][j] = Math.min(
-						table[i - 1][j] + 1, // 挿入
+						table[i - 1][j], // 挿入
 				Math.min(
-						table[i][j - 1] + 1, // 削除
+						table[i][j - 1], // 削除
 						table[i - 1][j - 1] + cost));	// 置換
 			}
 		return table[str1.length][str2.length];
-	}	
+	}
 	
 	/**
 	 * タスクに重みを付けたデータクラス
