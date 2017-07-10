@@ -136,8 +136,8 @@ public class TaskManager {
 	public ArrayList<Task> getTask(Date d) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for(Task task : tasks.values())
-			if(task.getStart().after(d) && task.getLimit().before(d))
-				result.add(task);		
+			if(task.getStart().getTime() <= d.getTime() && d.getTime() <= task.getLimit().getTime())
+				result.add(task);
 		return result;
 	}
 
