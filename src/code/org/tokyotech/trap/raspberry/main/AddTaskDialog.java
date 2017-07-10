@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -39,12 +40,17 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 			JLabel ExpLabel = new JLabel("説明");
 			JTextField ExpText = new JTextField("", 10);
 			
-			JLabel LimitLabel = new JLabel("期限                          月             日");
-			JTextField LimitMonthText = new JTextField("", 10);
-			JTextField LimitDayText = new JTextField("", 10);
+			JLabel LimitLabel = new JLabel("期限                                月                日");
+			String Month[]= new String[12];
+			String Day[] = new String[31];
+			
+			
+			
+			JComboBox LimitMonthText = new JComboBox();
+			JComboBox LimitDayText = new JComboBox();
 			
 			JLabel WeightLabel = new JLabel("重さ");
-			JTextField WeightText = new JTextField("5", 10);
+			JTextField WeightText = new JTextField("", 10);
 			
 			JLabel CicleLabel = new JLabel("サイクル設定                   日");
 			JTextField CicleText = new JTextField("", 10);
@@ -84,8 +90,20 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 		getContentPane().add(ExpLabel);
 		getContentPane().add(ExpText);
 		
-		LimitMonthText.setBounds(SpacePx ,10 + LineSpacePx * 2,40,20);
-		LimitDayText.setBounds(SpacePx + 60,10 + LineSpacePx * 2,40,20);
+		//タスクの期限
+		//月日の配列を初期化
+		for(int i = 0;i<Month.length;i++){
+			Month[i] = String.valueOf(i+1);
+		}
+		
+		for(int i = 0;i<Day.length;i++){
+			Day[i] = String.valueOf(i+1);
+		}
+		LimitMonthText = new JComboBox(Month);
+		LimitDayText = new JComboBox(Day);
+	
+		LimitMonthText.setBounds(SpacePx ,10 + LineSpacePx * 2,66,20);
+		LimitDayText.setBounds(SpacePx + 80,10 + LineSpacePx * 2,66,20);
 		LimitLabel.setBounds(10,10 + LineSpacePx * 2,400,20);
 		getContentPane().add(LimitLabel);
 		getContentPane().add(LimitMonthText);
@@ -134,16 +152,22 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 		getContentPane().add(ErrorLabel);
 		
 	}
+	
+	//入力チェックの正規表現
+	static boolean isNumMatch(String number) {
+	    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^[1-9][0-9]*$");
+	    java.util.regex.Matcher matcher = pattern.matcher(number);
+	    return matcher.matches();
+	} 
+	
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("");
 		/*
 		 TODO
+		 日付のエラーチェック
 		 フォームに上限を設置する
-		 追加したタグの表示
-		 入力データのパース
 		 タグの削除
 		 タスクの削除
-		 登録のキャンセル
 		 その日のタスク一覧を表示する
 		 カレンダーから選択するとダイアログを表示する
 		 */
@@ -152,29 +176,21 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 			
 	       /* addtaskを呼ぶ */
 			SimpleDateFormat dateTimeFormat  = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			
-			 String name = NameText.getText(); //タスクの登録名
-			 ArrayList<Tag>  tags = AddTags; //タスクに登録されたタグ
-			 Date start = null; //タスクを登録した日時
-			 java.util.Date limit = null;
-			 
-			try {
-				limit = dateTimeFormat.parse("2017/"+LimitMonthText.getText()+"/"+LimitDayText.getText()+ " 15:00:00");
-			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				error = 2;
-				//System.out.println(error);
-				e1.printStackTrace();
-			} //タスクの期限 
-			 String explanation = ExpText.getText(); //タスクの説明
-			 Time scheduledTime = null; // タスクの終了予想時間 
-			 int oopInterval = 1; // 繰り返し間隔
-			 
+			String name;
+			java.util.Date limit = null;
+			ArrayList<Tag> tags; //タスクに登録されたタグ
+			Date start; //タスクを登録した日時
+			String explanation;//タスクの説明
+			Time scheduledTime; // タスクの終了予想時間 
+			int oopInterval;
 			 //エラーチェック
 			 //..
 			 
-			 if(NameText.getText().length() * ExpText.getText().length() * LimitMonthText.getText().length() * LimitDayText.getText().length() * WeightText.getText().length() == 0){
+			 if(NameText.getText().length() * ExpText.getText().length() == 0){
 				 error = 1;
+			 }
+			 else if(!isNumMatch(CicleText.getText()) || !isNumMatch(WeightText.getText()) )	 {
+				 error = 2;
 			 }
 			 else{
 				 error = 0;
@@ -187,6 +203,21 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 				 ErrorLabel.setText("!入力データが不正です!");
 			 }
 			 else{
+				 //タスクを登録する
+				 try {
+						limit = dateTimeFormat.parse("2017/"+LimitMonthText.getSelectedItem()+"/"+LimitDayText.getSelectedItem()+ " 15:00:00");
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						error = 2;
+						//System.out.println(error);
+						e1.printStackTrace();
+					} //タスクの期限 
+				 name = NameText.getText(); //タスクの登録名
+				 tags = AddTags; //タスクに登録されたタグ
+				 start = null; //タスクを登録した日時
+				 explanation = ExpText.getText(); //タスクの説明
+				 scheduledTime = null; // タスクの終了予想時間 
+				 oopInterval = 1; // 繰り返し間隔
 				 Task task = new Task(name, tags, start, limit,  explanation, scheduledTime, oopInterval);
 				 TaskManager.instance().addTask(task);
 				 ErrorLabel.setText("登録完了");
