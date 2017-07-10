@@ -12,8 +12,4 @@ public class TaskPanel extends JPanel {
         setPreferredSize(new Dimension(200,100));
         setBackground(Color.WHITE);
     }
-
-    public void step(){
-
-    }
 }

@@ -29,19 +29,26 @@ public class CalendarPanel extends JPanel {
 
 		setLayout(null);
 
-		JPanel panel = new JPanel();
+		JPanel panel1 = new JPanel();
 		JLabel tuki = new JLabel(""+(month+1) + "月");
-		panel.setBounds(50,10,620,30);
-		panel.setBackground(Color.WHITE);
-		panel.add(tuki);
-		add(panel);
+		panel1.setBounds(50,10,620,20);
+		panel1.setBackground(Color.WHITE);
+		panel1.add(tuki);
+		add(panel1);
+
+		JPanel panel2 = new JPanel();
+		JLabel week = new JLabel("日　　　　　　月　　　　　　火　　　　　　水　　　　　　木　　　　　　金　　　　　　土");
+		panel2.setBounds(50,40,620,20);
+		panel2.setBackground(Color.WHITE);
+		panel2.add(week);
+		add(panel2);
 
         for(int i = 0;i < 6;i++) {
-            add(new WeekButton(i + 1, 50 + i * 90));
+            add(new WeekButton(i + 1, 70 + i * 90));
         }
 
         for(int i = 0;i < weekcount;i++){
-            gridY = 50+i*90;
+            gridY = 70+i*90;
                 for (int j = i * 7; j < i * 7 + 7; j++) {
                         if (calendarday[j] > 35) {
                             add(new DayPanel(calendarday[j] - 35,50+90*gridX, gridY, 80, 80));
@@ -86,13 +93,6 @@ public class CalendarPanel extends JPanel {
             calendarday[count++] =35 + nextmonthday++;
         }
         return count;
-    }
-
-	public void update(){}
-
-	public void step(){}
-
-	public void draw(Graphics2D g){
     }
 
 }

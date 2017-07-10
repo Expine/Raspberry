@@ -12,5 +12,4 @@ public class WeekButton extends JButton {
         setBounds(10,position,20,80);
     }
 
-    public void step(){}
 }

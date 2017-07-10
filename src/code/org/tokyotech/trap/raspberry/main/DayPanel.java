@@ -9,7 +9,9 @@ import java.util.Calendar;
  */
 public class DayPanel extends JPanel {
 
+    Calendar calendar = Calendar.getInstance();
     protected static int date;
+    int day = calendar.get(Calendar.DATE);
 
     public DayPanel(int date,int x,int y,int width,int height){
         super();
@@ -18,8 +20,10 @@ public class DayPanel extends JPanel {
         setBackground(Color.WHITE);
         JLabel label = new JLabel("" + date);
         add(label);
-        //add(new TaskPanel());
+
+        if(date == day){
+            setBackground(Color.BLUE);
+        }
     }
 
-    public void step(){}
 }
