@@ -21,6 +21,7 @@
 hs_err_pid*
 
 /bin/
+/doc/
 /.settings/
 /.classpath
 /.project
