@@ -3,12 +3,8 @@ package code.org.tokyotech.trap.raspberry.execute;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Time;
 import javax.swing.*;
-
 import code.org.tokyotech.trap.raspberry.task.Task;
-
-import java.awt.Dialog;
 
 /**
  * タスク実行のダイアログ
@@ -30,7 +26,7 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 	private Task task;
 
 
-	ExecuteDialog(){
+	ExecuteDialog(Task task){
 
 
 		 this.task=task;
@@ -131,8 +127,4 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		button.setActionCommand(command);
 	}
 
-public static void main(String[] args){new JFrame(); new ExecuteDialog();}
-
 }
-
-

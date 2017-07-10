@@ -1,13 +1,13 @@
 package code.org.tokyotech.trap.raspberry.execute;
 
 import java.awt.CardLayout;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
 import code.org.tokyotech.trap.raspberry.task.Task;
+import code.org.tokyotech.trap.raspberry.task.TaskManager;
 
 /**
  * タスクを閉じる際の確認画面
@@ -19,10 +19,13 @@ public class CloseDialog extends JDialog implements ActionListener{
 	private CardLayout layout;
 	private JPanel mainPanel;
 	private Task task;
+	private JDialog parent;
 
 
 	public CloseDialog(JDialog parent, Task task){
 
+		super(parent);
+		this.parent=parent;
 		this.task=task;
 		mainPanel=new JPanel(new CardLayout());
 
@@ -49,8 +52,8 @@ public class CloseDialog extends JDialog implements ActionListener{
 		JPanel closedPanel=new JPanel();
 		JButton okButton=new JButton("OK");
 		JLabel closedLabel=new JLabel("タスクを閉じました。");
-		closedPanel.add(okButton);
 		closedPanel.add(closedLabel);
+		closedPanel.add(okButton);
 		setButton(okButton,"return");
 
 		mainPanel.add(askPanel,"ask");
@@ -70,15 +73,16 @@ public class CloseDialog extends JDialog implements ActionListener{
   	public void actionPerformed(ActionEvent e){
 		String cmd=e.getActionCommand();
 
-		if(cmd=="try_closePanel"){
-			if(task.getElapsedTime().getTime()<task.getScheduledTime().getTime())
+		if(cmd=="try_closetask"){
+			if(task.getElapsedTime().getTime()<task.getScheduledTime().getTime() )
 			  layout.show(mainPanel,"warning");
-			else layout.show(mainPanel, "closed");
+			else {layout.show(mainPanel, "closed"); TaskManager.instance().closeTask(task.getID());}
+
 		}
 
-		if(cmd=="return")   dispose();
+		if(cmd=="return")   parent.dispose();
 
-		if(cmd=="closetask"){layout.show(mainPanel, "closed");  }
+		if(cmd=="closetask"){layout.show(mainPanel, "closed"); TaskManager.instance().closeTask(task.getID()); }
 
 	}
 
