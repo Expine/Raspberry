@@ -5,7 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Time;
 import javax.swing.*;
-import code.org.tokyotech.trap.raspberry.task.*;
+
+import code.org.tokyotech.trap.raspberry.task.Task;
+
+import java.awt.Dialog;
 
 /**
  * タスク実行のダイアログ
@@ -27,7 +30,8 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 	private Task task;
 
 
-	ExecuteDialog(Task task){
+	ExecuteDialog(){
+
 
 		 this.task=task;
 		 mainPanel=new JPanel(new CardLayout());
@@ -38,12 +42,13 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		JPanel selectPanel=new JPanel();                      //選択画面
 		JButton startWorkButton=new JButton("タスクを始める");
 		JButton closeButton=new JButton("タスクを閉じる");
+		JButton returnButton=new JButton("戻る");
+		selectPanel.add(returnButton);
 		selectPanel.add(startWorkButton);
 		selectPanel.add(closeButton);
-		startWorkButton.addActionListener(this);
-		startWorkButton.setActionCommand("workstart");
-		closeButton.addActionListener(this);
-		closeButton.setActionCommand("close");
+		setButton(startWorkButton,"startworking");
+		setButton(closeButton,"close");
+		setButton(returnButton,"return");
 
 
 
@@ -54,11 +59,8 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		workingPanel.add(workTimeLabel_working);
 		workingPanel.add(finishButton);
 		workingPanel.add(restButton);
-		finishButton.addActionListener(this);
-		finishButton.setActionCommand("finish");
-		restButton.addActionListener(this);
-		restButton.setActionCommand("rest");
-
+		setButton(finishButton,"finishworking");
+		setButton(restButton,"rest");
 
 
 		JPanel restPanel=new JPanel();				//中断画面
@@ -66,14 +68,16 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		workTimeLabel_rest=new JLabel("作業時間:"+workTimeText);
 		restPanel.add(workTimeLabel_rest);
 		restPanel.add(restartButton);
-		restartButton.addActionListener(this);
-		restartButton.setActionCommand("restart");
-
+		setButton(restartButton,"restart");
 
 
 		JPanel finishPanel=new JPanel();			   //終了画面
+		JButton okButton=new JButton("OK");
 		workTimeLabel_finish=new JLabel("今回の作業時間:"+workTimeText);
+		setButton(okButton,"return");
 		finishPanel.add(workTimeLabel_finish);
+		finishPanel.add(okButton);
+
 
 		mainPanel.add(selectPanel,"select");
 		mainPanel.add(workingPanel,"working");
@@ -85,17 +89,18 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 
 		setSize(500,300);
 		setLocationRelativeTo(null);
+		setModal(true);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setModal(true);
+
 	}
 
 	public void actionPerformed(ActionEvent e){
 		String cmd=e.getActionCommand();
 
-		if(cmd=="workstart"){layout.show(mainPanel, "working"); timer.start();}
+		if(cmd=="startworking"){layout.show(mainPanel, "working"); timer.start();}
 
-		if(cmd=="close") 	{new CloseDialog();}
+		if(cmd=="close") 	{new CloseDialog(this, task); }
 
 
 		if(cmd=="rest")
@@ -105,11 +110,14 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 
 		if(cmd=="restart")	{timer.start(); layout.show(mainPanel, "working");}
 
-		if(cmd=="finish")
+		if(cmd=="finishworking")
 		{timer.stop();
 		 layout.show(mainPanel, "finish");
 		 workTimeLabel_finish.setText("今回の作業時間:"+workTimeText);
-		 TaskManager.instance().progress(task.getID(),new Time(1000*worktime));}
+		// TaskManager.instance().progress(task.getID(),new Time(1000*worktime));
+		 }
+
+		if(cmd=="return") {dispose();}
 
 		if(cmd=="timer")
 		{ worktime++;
@@ -118,6 +126,13 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 
 	}
 
+	private void setButton(JButton button,String command){
+		button.addActionListener(this);
+		button.setActionCommand(command);
+	}
 
+public static void main(String[] args){new JFrame(); new ExecuteDialog();}
 
 }
+
+
