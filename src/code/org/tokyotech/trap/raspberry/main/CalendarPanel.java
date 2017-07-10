@@ -8,10 +8,6 @@ import java.util.Calendar;
 
 public class CalendarPanel extends JPanel {
 
-	public enum chapter{
-        MONTH,WEEK,DAY;
-    }
-
     public CalendarPanel() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

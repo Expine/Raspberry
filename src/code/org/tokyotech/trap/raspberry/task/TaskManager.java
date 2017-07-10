@@ -127,7 +127,7 @@ public class TaskManager {
 	public Task getTask(int i) {
 		return tasks.size()  > i ? tasks.get(i) : null;
 	}
-	
+
 	/**
 	 * ある日付を含むタスクを取得する
 	 * @param d 取得する日付
@@ -137,7 +137,7 @@ public class TaskManager {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for(Task task : tasks.values())
 			if(task.getStart().after(d) && task.getLimit().before(d))
-				result.add(task);		
+				result.add(task);
 		return result;
 	}
 

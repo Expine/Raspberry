@@ -27,7 +27,7 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 	private Task task;
 
 
-	ExecuteDialog(Task task){
+	public ExecuteDialog(Task task){
 
 		 this.task=task;
 		 mainPanel=new JPanel(new CardLayout());

@@ -124,7 +124,7 @@ public class AddTaskDialog extends JFrame implements ActionListener{
 		Submit.setBounds(10,10 + LineSpacePx * 7,100,20);
 		getContentPane().add(Submit);
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("task");
 		setSize(400, 230);
 		setVisible(true);
