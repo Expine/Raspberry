@@ -20,8 +20,6 @@ public class TodayPanel extends JPanel {
 	public TodayPanel() {
 		setPreferredSize(new Dimension(200, 600));
 
-		setLayout(new FlowLayout());
-
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel(""+day + "日");
 		panel.setPreferredSize(new Dimension(200,30));
@@ -29,13 +27,22 @@ public class TodayPanel extends JPanel {
 		panel.add(label);
 		add(panel);
 
+		JPanel scroll = new JPanel();
+		JScrollPane jScrollPane = new JScrollPane(scroll);
+		jScrollPane.setPreferredSize(new Dimension(200,700));
+
 		Task t1 = new Task("Name", new ArrayList<Tag>(), calendar.getTime(), new Date(calendar.getTimeInMillis() + 10000L), "Exp", new Time(2000), 0);
 		TaskManager.instance().addTask(t1);
 
 		for(Task t : TaskManager.instance().getTask(Calendar.getInstance().getTime())) {
 			System.out.print(t);
+			scroll.add(new TaskPanel(t));
 		}
 
+		/*SpringLayout layout = new SpringLayout();
+		scroll.setLayout(layout);*/
+
+		add(jScrollPane);
 	}
 
 }
