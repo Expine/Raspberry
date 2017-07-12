@@ -6,11 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -41,6 +39,7 @@ public class TaskManager {
 	/**
 	 * タスクデータを読み込む
 	 */
+	@SuppressWarnings("unchecked")
 	private void loadTaskData() {		
 		// Check file
 		if(!(new File("./config").exists()))
@@ -50,10 +49,10 @@ public class TaskManager {
 		try {
 			if(new File("./config/.config").exists()) {
 				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("./config/.config")));
-				while((line = br.readLine()) != null) {
-					
+				while((line = br.readLine()) != null) {					
 					Task.startID = Integer.parseInt(line);
 				}
+				br.close();
 			}
 			if(new File("./config/.task").exists()) {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./config/.task"));

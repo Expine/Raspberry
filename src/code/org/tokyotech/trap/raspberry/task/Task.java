@@ -77,7 +77,7 @@ public class Task implements Serializable {
 		this.checkPointExp = checkPointExp;
 		this.scheduledTime = scheduledTime;
 		this.loopInterval = loopInterval;
-		this.elapsedTime = new Time(0);
+		this.elapsedTime = new Time(15 * 60 * 60 * 1000);
 	}
 
 	public int getID() {

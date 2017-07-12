@@ -2,13 +2,10 @@ package code.org.tokyotech.trap.raspberry.main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Time;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import code.org.tokyotech.trap.raspberry.execute.ExecuteDialog;
-import code.org.tokyotech.trap.raspberry.task.Tag;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
 
@@ -54,12 +51,21 @@ public class TodayPanel extends JPanel {
 
 			gbc.gridx = 0;
 			gbc.gridy = 0;
+			gbc.gridwidth = 2;
 			gbc.fill = GridBagConstraints.BOTH;
 			gbc.insets = new Insets(5, 5, 5, 5);
 			JLabel name = new JLabel(t.getName());
 			layout.setConstraints(name, gbc);
 			task.add(name);
+
+			gbc.gridx = 2;
+			gbc.gridwidth = 1;
+			JLabel time = new JLabel(new SimpleDateFormat("H時間m分s秒").format(t.getElapsedTime()));
+			layout.setConstraints(time, gbc);
+			task.add(time);
 			
+			
+			gbc.gridx = 0;
 			gbc.gridy = 2;
 			gbc.gridwidth = 3;
 			JTextArea exp = new JTextArea(5, 20);
