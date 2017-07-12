@@ -57,26 +57,33 @@ public class TodayPanel extends JPanel {
 			JLabel name = new JLabel(t.getName());
 			layout.setConstraints(name, gbc);
 			task.add(name);
+			
+			gbc.gridx = 0;
+			gbc.gridy++;
+			JLabel procLabel = new JLabel("進捗時間");
+			layout.setConstraints(procLabel, gbc);
+			task.add(procLabel);
 
-			gbc.gridx = 2;
+			gbc.gridx = 1;
 			gbc.gridwidth = 1;
-			JLabel time = new JLabel(new SimpleDateFormat("H時間m分s秒").format(t.getElapsedTime()));
-			layout.setConstraints(time, gbc);
-			task.add(time);
-			
-			
+			JLabel proctime = new JLabel(new SimpleDateFormat("H時間m分s秒").format(t.getElapsedTime()));
+			layout.setConstraints(proctime, gbc);
+			task.add(proctime);
+
 			gbc.gridx = 0;
-			gbc.gridy = 2;
-			gbc.gridwidth = 3;
-			JTextArea exp = new JTextArea(5, 20);
-			JScrollPane exp_s = new JScrollPane(exp);
-			exp.setText(t.getExplanation());
-			exp.setEditable(false);
-			layout.setConstraints(exp_s, gbc);
-			task.add(exp_s);
-			
+			gbc.gridy++;
+			JLabel scheduledLabel = new JLabel("予想時間");
+			layout.setConstraints(scheduledLabel, gbc);
+			task.add(scheduledLabel);
+
+			gbc.gridx = 1;
+			gbc.gridwidth = 1;
+			JLabel scheduledtime = new JLabel(new SimpleDateFormat("H時間m分s秒").format(t.getScheduledTime()));
+			layout.setConstraints(scheduledtime, gbc);
+			task.add(scheduledtime);
+
 			gbc.gridx = 0;
-			gbc.gridy = 1;
+			gbc.gridy++;
 			gbc.gridwidth = 1;
 			JButton run = new JButton("実行");
 			run.addActionListener(e -> { new ExecuteDialog(t); owner.reflesh(); });
@@ -88,8 +95,18 @@ public class TodayPanel extends JPanel {
 			close.addActionListener(e -> { TaskManager.instance().closeTask(t.getID()); owner.reflesh(); });
 			layout.setConstraints(close, gbc);
 			task.add(close);
+
+			gbc.gridx = 0;
+			gbc.gridy++;
+			gbc.gridwidth = 3;
+			JTextArea exp = new JTextArea(5, 20);
+			JScrollPane exp_s = new JScrollPane(exp);
+			exp.setText(t.getExplanation());
+			exp.setEditable(false);
+			layout.setConstraints(exp_s, gbc);
+			task.add(exp_s);
 			
-			tasks.add(task);
+						tasks.add(task);
 		}		
 	}
 	

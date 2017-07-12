@@ -28,8 +28,8 @@ public class KeyManager implements NativeKeyListener{
             }
         }		
         final Logger jNativeHookLogger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-        if (jNativeHookLogger.getLevel() != Level.OFF) {
-                jNativeHookLogger.setLevel(Level.OFF);
+        if (jNativeHookLogger.getLevel() != Level.SEVERE) {
+                jNativeHookLogger.setLevel(Level.SEVERE);
         }
 	
 		GlobalScreen.addNativeKeyListener(new KeyManager());		
@@ -45,25 +45,32 @@ public class KeyManager implements NativeKeyListener{
 				}
 				elapsedTime += System.nanoTime() - beg;
 			}
-		}).start();;
+		}).start();
 	}
 	
 	/**
 	 * キーが押されていない時間を返す
 	 * @return キーが押されていない時間
 	 */
-	public long getElapsedTime() {
+	public static long getElapsedTime() {
 		return elapsedTime;
+	}
+	
+	/**
+	 * 時間をリセットする
+	 */
+	public static void reset() {
+		elapsedTime = 0;
 	}
 
 	@Override
-	public void nativeKeyPressed(NativeKeyEvent arg0) {}
+	public void nativeKeyPressed(NativeKeyEvent arg0) {
+		elapsedTime = 0;
+	}
 
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent arg0) {}
 
 	@Override
-	public void nativeKeyTyped(NativeKeyEvent arg0) {
-		elapsedTime = 0;
-	}
+	public void nativeKeyTyped(NativeKeyEvent arg0) {}
 }

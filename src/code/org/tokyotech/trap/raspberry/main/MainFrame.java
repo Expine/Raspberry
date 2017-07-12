@@ -7,6 +7,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import code.org.tokyotech.trap.raspberry.execute.KeyManager;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
 
 import java.awt.*;
@@ -28,6 +29,7 @@ public class MainFrame extends JFrame {
 	
 	public MainFrame() {
 		setMenuBar();
+		KeyManager.register();
 		
 		setTitle("Raspberry");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);

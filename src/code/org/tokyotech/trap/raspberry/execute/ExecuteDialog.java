@@ -1,6 +1,8 @@
 package code.org.tokyotech.trap.raspberry.execute;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -80,6 +82,8 @@ public class ExecuteDialog extends JDialog {
 		 setLocationRelativeTo(null);
 		 setModal(true);
 		 setVisible(true);
+		 
+		 KeyManager.reset();
 
 	}
 	
@@ -107,10 +111,21 @@ public class ExecuteDialog extends JDialog {
 	
 	private void endTask() {
 		TaskManager.instance().progress(task.getID(), new Time(1000 * workTime));
+		timer.stop();
 		dispose();
 	}
 	
 	private void refleshTimeLabel() {
+		System.out.println(KeyManager.getElapsedTime());
+		if(KeyManager.getElapsedTime() > 60L * 1000000000L) {
+			JOptionPane jop = new JOptionPane("進捗どうですか？", JOptionPane.ERROR_MESSAGE);
+			JDialog dialog = jop.createDialog(null, "進捗確認");
+			dialog.setAlwaysOnTop(true);
+			dialog.setVisible(true);
+			dialog.setAlwaysOnTop(false);
+			KeyManager.reset();
+		}
+		
 		if(isStop())
 			timeLabel.setText("休憩時間 : " + restTime / 3600 + "時間"+ (restTime % 3600) / 60+"分" + restTime % 60 + "秒");
 		else
