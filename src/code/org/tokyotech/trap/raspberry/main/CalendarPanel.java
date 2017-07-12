@@ -1,94 +1,128 @@
 package code.org.tokyotech.trap.raspberry.main;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.text.SimpleDateFormat;
 
 import javax.swing.*;
 
+import code.org.tokyotech.trap.raspberry.config.ConfigDialog;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
+/**
+ * カレンダーのパネル
+ * @author yuu
+ */
 public class CalendarPanel extends JPanel {
+	/** パネルの横幅 */
+	public static final int CALENDAR_WIDTH = 700;
+	/** パネルの縦幅 */
+	public static final int CALENDAR_HEIGHT = 600;
+	
+	private static final int DAY_WIDTH = 80;
+	private static final int DAY_HEIGHT = 80;
 
-    public CalendarPanel() {
+	/** 週の数 */
+	private static final int WEEK = 7;
+	/** 表示する週の数 */
+	private static final int WEEKS_NUMBER = 6;
+	
+	private final JFrame owner;
+	
+	@SuppressWarnings("unchecked")
+	/** 各日付のパネル */
+	private ArrayList<JPanel>[] list = new ArrayList[WEEKS_NUMBER];
+
+    public CalendarPanel(JFrame owner) {
+    	// 初期設定
+    	this.owner = owner;
+    	for(int i = 0; i < list.length; ++i)
+    		list[i] = new ArrayList<JPanel>();
+    	
+    	// 基本情報取得
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
-        int[] calendarday = new int[42];
-        int count = 0;
-        int gridX,gridY;
-        gridX = 0;
+        Date now = calendar.getTime();
+        String[] days = {"日", "月", "火", "水", "木", "金", "土"};
 
-        count = setDateArray(year,month,day,calendarday,count);
-        int weekcount = count / 7;
+        // サイズを設定
+		setPreferredSize(new Dimension(CALENDAR_WIDTH, CALENDAR_HEIGHT));
+        // レイアウトを設定
+		GridBagLayout layout = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+		setLayout(layout);
 
-		setPreferredSize(new Dimension(700, 600));
+		JPanel month = new JPanel();
+		month.add(new JLabel(new SimpleDateFormat("yyyy年 M月").format(now)));
+		month.setBackground(Color.WHITE);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 7;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(3, 3, 3, 3);
+		layout.setConstraints(month, gbc);
+		add(month);
+		
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		for(int i = 0; i < WEEK; ++i) {
+			gbc.gridx = i;
+			JPanel day = new JPanel();
+			day.add(new JLabel(days[i]));
+			day.setBackground(Color.WHITE);
+			layout.setConstraints(day, gbc);
+			add(day);
+		}
 
-		setLayout(null);
-
-		JPanel panel1 = new JPanel();
-		JLabel tuki = new JLabel(""+(month+1) + "月");
-		panel1.setBounds(50,10,620,20);
-		panel1.setBackground(Color.WHITE);
-		panel1.add(tuki);
-		add(panel1);
-
-		JPanel panel2 = new JPanel();
-		JLabel week = new JLabel("日　　　　　　月　　　　　　火　　　　　　水　　　　　　木　　　　　　金　　　　　　土");
-		panel2.setBounds(50,40,620,20);
-		panel2.setBackground(Color.WHITE);
-		panel2.add(week);
-		add(panel2);
-
-        for(int i = 0;i < 6;i++) {
-            add(new WeekButton(i + 1, 70 + i * 90));
-        }
-
-        for(int i = 0;i < weekcount;i++){
-            gridY = 70+i*90;
-                for (int j = i * 7; j < i * 7 + 7; j++) {
-                        if (calendarday[j] > 35) {
-                            add(new DayPanel(calendarday[j] - 35,50+90*gridX, gridY, 80, 80));
-                            gridX++;
-                            if(gridX > 6){
-                                gridX = 0;
-                            }
-                        }else {
-                            add(new DayPanel(calendarday[j],50+90*gridX, gridY, 80, 80));
-                            gridX++;
-                            if(gridX > 6){
-                                gridX = 0;
-                            }
-                        }
-                }
-
-        }
-	}
-
-	protected int setDateArray(int year, int month, int day, int[] calendarday, int count){
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(year,month,1);
-        int startweek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        calendar.set(year,month,0);
-        int beforemonthlastday = calendar.get(Calendar.DATE);
-
-        calendar.set(year,month + 1,0);
-        int thismonthlastday = calendar.get(Calendar.DATE);
-
-        for(int i = startweek - 2;i >= 0;i--){
-            calendarday[count++] = beforemonthlastday - i  + 35;
-        }
-
-        for(int i = 1;i <= thismonthlastday;i++){
-            calendarday[count++] = i;
-        }
-
-        int nextmonthday = 1;
-        while(count % 7 != 0){
-            calendarday[count++] =35 + nextmonthday++;
-        }
-        return count;
+		// 本日の最初の日数を設定
+		Calendar proc = Calendar.getInstance();
+		proc.add(Calendar.DAY_OF_MONTH, - (WEEK - proc.getMinimalDaysInFirstWeek() ) - proc.get(Calendar.DAY_OF_MONTH) + 1);
+		for(int i = 0; i < WEEKS_NUMBER; ++i) {
+			gbc.gridy = 2 + i;
+			for(int j = 0; j < WEEK; ++j) {
+				gbc.gridx = j;
+				JPanel panel = getDayPanel(calendar, proc);
+				list[i].add(panel);
+				layout.setConstraints(panel, gbc);
+				add(panel);
+				proc.add(Calendar.DAY_OF_MONTH, 1);
+			}
+		}
     }
-
+    
+    private JPanel getDayPanel(Calendar today, Calendar d) {
+    	// ラムダのために日付を保持する
+    	JFrame owner = this.owner;
+    	Calendar rest = (Calendar) d.clone();
+    	JPanel panel = new JPanel();
+    	panel.setPreferredSize(new Dimension(DAY_WIDTH, DAY_HEIGHT));
+    	// 色を設定
+    	panel.setBackground( 
+    			today.get(Calendar.MONTH) != d.get(Calendar.MONTH) ? Color.GRAY :
+    			d.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ? new Color(100, 100, 255) :
+    			d.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? new Color(255, 100, 100) : Color.WHITE);
+    	panel.add(new JLabel(new SimpleDateFormat("d").format(d.getTime())), BorderLayout.NORTH);
+    	panel.addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent e) {}
+			public void mousePressed(MouseEvent e) {
+//				new AddTaskDialog();
+				new ConfigDialog(owner, rest, e.getXOnScreen(), e.getYOnScreen());
+			}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
+		});
+//    	panel.add(getTaskPanel(today, d), BorderLayout.SOUTH);
+    	return panel;
+    }    
+    
+    private JPanel getTaskPanel(Calendar today, Calendar d) {
+    	JPanel panel = new JPanel();
+    	panel.setBackground(Color.WHITE);
+    	return panel;
+    }
 }

@@ -19,6 +19,9 @@ import java.util.HashMap;
  * @since 2017/7/5
  */
 public class MainFrame extends JFrame {
+	private CalendarPanel calendar = new CalendarPanel(this);
+	private TodayPanel today = new TodayPanel();
+	
 	public MainFrame() {
 		setMenuBar();
 		
@@ -27,8 +30,8 @@ public class MainFrame extends JFrame {
 
 		setLayout(new FlowLayout());
 		
-		add(new CalendarPanel());
-		add(new TodayPanel());
+		add(calendar);
+		add(today);
 		pack();
 		
 		setVisible(true);
