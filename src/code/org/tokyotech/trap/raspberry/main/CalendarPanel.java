@@ -35,12 +35,12 @@ public class CalendarPanel extends JPanel {
 	private static final int WEEKS_NUMBER = 6;
 
 	/** 親のフレーム */
-	private final JFrame owner;
+	private final MainFrame owner;
 	
 	/** タスクのパネルのリスト */
 	private ArrayList<PanelWithDate> taskPanelList = new ArrayList<PanelWithDate>();
 
-    public CalendarPanel(JFrame owner) {
+    public CalendarPanel(MainFrame owner) {
     	// 初期設定
     	this.owner = owner;
     	
@@ -101,15 +101,14 @@ public class CalendarPanel extends JPanel {
      */
     private JPanel getDayPanel(Calendar today, Calendar d) {
     	// ラムダのために日付を保持する
-    	CalendarPanel self = this;
-    	JFrame owner = this.owner;
+    	MainFrame owner = this.owner;
     	Calendar rest = (Calendar) d.clone();
     	JPanel panel = new JPanel();
     	MouseListener lis = new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
 			public void mousePressed(MouseEvent e) {
 //				new AddTaskDialog();
-				new ConfigDialog(self, owner, rest, e.getXOnScreen(), e.getYOnScreen());
+				new ConfigDialog(owner, rest, e.getXOnScreen(), e.getYOnScreen());
 			}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
@@ -120,11 +119,20 @@ public class CalendarPanel extends JPanel {
     	// 色を設定
     	panel.setBackground( 
     			today.get(Calendar.MONTH) != d.get(Calendar.MONTH) ? Color.GRAY :
+       			today.get(Calendar.DAY_OF_MONTH) == d.get(Calendar.DAY_OF_MONTH) ? Color.YELLOW :
     			d.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ? new Color(100, 100, 255) :
     			d.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? new Color(255, 100, 100) : Color.WHITE);
     	panel.add(new JLabel(new SimpleDateFormat("d").format(d.getTime())), BorderLayout.NORTH);
     	panel.addMouseListener(lis);
     	JScrollPane task = new JScrollPane(getTaskPanel(today, d));
+    	task.getVerticalScrollBar().addMouseMotionListener(new MouseMotionListener() {
+			public void mouseDragged(MouseEvent e) {
+				owner.pack();				
+				owner.repaint();
+			}
+			public void mouseMoved(MouseEvent e) {}
+		});
+    	task.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     	task.setOpaque(true);
     	task.setBackground(new Color(0, 0, 0, 0));
     	task.setPreferredSize(new Dimension(DAY_WIDTH - 10, DAY_HEIGHT * 2 / 3));

@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class MainFrame extends JFrame {
 	private CalendarPanel calendar = new CalendarPanel(this);
-	private TodayPanel today = new TodayPanel();
+	private TodayPanel today = new TodayPanel(this);
 	
 	public MainFrame() {
 		setMenuBar();
@@ -82,6 +82,11 @@ public class MainFrame extends JFrame {
 		setJMenuBar(menu);
 	}
 	
+	public void reflesh() {
+		calendar.reflesh();
+		today.reflesh();
+	}
+	
 	private class MenuItem {
 		JMenu menu;
 		char acceralator;
@@ -100,5 +105,5 @@ public class MainFrame extends JFrame {
 			item.setAccelerator(key);
 			item.addActionListener(a);
 		}		
-	}
+	}	
 }

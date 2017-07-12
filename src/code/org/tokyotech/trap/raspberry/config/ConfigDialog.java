@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import code.org.tokyotech.trap.raspberry.main.CalendarPanel;
+import code.org.tokyotech.trap.raspberry.main.MainFrame;
 import code.org.tokyotech.trap.raspberry.task.Tag;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
@@ -45,7 +46,7 @@ public class ConfigDialog extends JDialog {
 	/** 単一のダイアログを表示するためのインスタンス */
 	private static ConfigDialog instance = null;
 
-	private CalendarPanel cpanel;
+	private MainFrame owner;
 	private JComboBox<String>[] year = new JComboBox[2];
 	private JComboBox<String>[] month = new JComboBox[2];
 	private JComboBox<String>[] day = new JComboBox[2];
@@ -56,7 +57,7 @@ public class ConfigDialog extends JDialog {
 	private JTextArea explanation;
 	private JPanel tags = new JPanel();
 	
-	public ConfigDialog(CalendarPanel cpanel, JFrame owner, Calendar date, int x, int y) {
+	public ConfigDialog(MainFrame owner, Calendar date, int x, int y) {
 		super(owner);
 		
 		// 既に表示済みの場合は何もしない
@@ -66,7 +67,7 @@ public class ConfigDialog extends JDialog {
 		}
 		instance = this;
 		
-		this.cpanel = cpanel;
+		this.owner = owner;
 		tags.setLayout(new FlowLayout());
 
         // レイアウトを設定
@@ -329,7 +330,7 @@ public class ConfigDialog extends JDialog {
 			e.printStackTrace();
 		}
 		
-		cpanel.reflesh();
+		owner.reflesh();
 		
 		dispose();
 	}
