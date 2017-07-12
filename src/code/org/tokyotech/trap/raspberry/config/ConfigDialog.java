@@ -6,11 +6,17 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,6 +30,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import code.org.tokyotech.trap.raspberry.task.Tag;
+import code.org.tokyotech.trap.raspberry.task.Task;
+import code.org.tokyotech.trap.raspberry.task.TaskManager;
+
 
 /**
  * タスク設定ダイアログ
@@ -34,8 +44,14 @@ public class ConfigDialog extends JDialog {
 	/** 単一のダイアログを表示するためのインスタンス */
 	private static ConfigDialog instance = null;
 	
-	private JComboBox<String> box;
+	private JComboBox<String>[] year = new JComboBox[2];
+	private JComboBox<String>[] month = new JComboBox[2];
+	private JComboBox<String>[] day = new JComboBox[2];
+	private JTextField taskName;
 	private JTextField tagName;
+	private JSpinner scheduledHour, scheduledMin;
+	private JSpinner weight;
+	private JTextArea explanation;
 	private JPanel tags = new JPanel();
 	
 	public ConfigDialog(JFrame owner, Calendar date, int x, int y) {
@@ -70,7 +86,7 @@ public class ConfigDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
 		gbc.gridy++;
-		setTextWithLabel("タスク名", layout, gbc, 4);
+		taskName = setTextWithLabel("タスク名", layout, gbc, 4);
 		
 		gbc.gridy++;
 		tagName = setTextWithLabel("タグ", layout, gbc, 3);
@@ -99,13 +115,36 @@ public class ConfigDialog extends JDialog {
 		
 		gbc.gridy++;
 		gbc.gridwidth = 1;
-		setDate("期限", date, layout, gbc);
+		setDate("開始", date, layout, gbc, 0);
+
+		gbc.gridy++;
+		gbc.gridwidth = 1;
+		setDate("期限", date, layout, gbc, 1);
+
+		gbc.gridy++;
+		gbc.gridwidth = 1;
+		setScheduledTime("予想時間", layout, gbc);
 		
 		gbc.gridy++;
 		setWeight("重さ", layout, gbc);
 		
 		gbc.gridy++;
-		setTextAreaWithLabel("説明", layout, gbc, 4);
+		explanation = setTextAreaWithLabel("説明", layout, gbc, 4);
+
+		gbc.gridy++;
+		gbc.gridx = 1;
+		gbc.gridwidth = 1;
+		JButton ok  = new JButton("タスクを作成");
+		ok.addActionListener(e -> { createTask(); });
+		layout.setConstraints(ok, gbc);
+		add(ok);
+		
+		gbc.gridx = 3;
+		gbc.gridwidth = 1;
+		JButton cancel  = new JButton("キャンセル");
+		cancel.addActionListener(e -> { dispose(); });
+		layout.setConstraints(cancel, gbc);
+		add(cancel);
 
 		pack();
 		setLocation(x - getWidth() / 2, y - getHeight() / 2);
@@ -146,7 +185,7 @@ public class ConfigDialog extends JDialog {
 		return nameText;
 	}
 
-	private void setTextAreaWithLabel(String text, GridBagLayout layout, GridBagConstraints gbc, int width) {
+	private JTextArea setTextAreaWithLabel(String text, GridBagLayout layout, GridBagConstraints gbc, int width) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
 		layout.setConstraints(name, gbc);
@@ -160,29 +199,82 @@ public class ConfigDialog extends JDialog {
 		add(nameText_s);			
 		gbc.gridwidth = 1;
 		add(name);
+		
+		return nameText;
 	}
 
-	private void setDate(String text, Calendar date, GridBagLayout layout, GridBagConstraints gbc) {
+	private void setDate(String text, Calendar date, GridBagLayout layout, GridBagConstraints gbc, int id) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
 		layout.setConstraints(name, gbc);
 		add(name);
 
 		gbc.gridx = 1;
-		JComboBox<String> month = new JComboBox<String>();
+		year[id] = new JComboBox<String>();
+		for(int i = date.get(Calendar.YEAR); i < 2039; ++i)
+			year[id].addItem(i + "年");
+		year[id].addItemListener(e -> { refleshDay(id); });
+		layout.setConstraints(year[id], gbc);
+		add(year[id]);
+
+		gbc.gridx = 2;
+		month[id] = new JComboBox<String>();
 		for(int i = 0; i < 12; ++i)
-			month.addItem((i+1) + "月");
-		month.setSelectedIndex(date.get(Calendar.MONTH));
-		layout.setConstraints(month, gbc);
-		add(month);
+			month[id].addItem((i+1) + "月");
+		month[id].setSelectedIndex(date.get(Calendar.MONTH));
+		month[id].addItemListener(e -> { refleshDay(id); });
+		layout.setConstraints(month[id], gbc);
+		add(month[id]);
+		
+		gbc.gridx = 3;
+		day[id]= new JComboBox<String>();
+		for(int i = 0; i < date.getActualMaximum(Calendar.DATE); ++i)
+			day[id].addItem((i+1) + "日");
+		day[id].setSelectedIndex(date.get(Calendar.DAY_OF_MONTH) - 1);
+		layout.setConstraints(day[id], gbc);
+		add(day[id]);
+	}
+	
+	private void refleshDay(int id) {
+		String y = year[id].getSelectedItem().toString();
+		String m = month[id].getSelectedItem().toString();
+		day[id].removeAllItems();
+		try {
+			int max = new Calendar.Builder().setInstant((new SimpleDateFormat("yyyy年M月").parse(y + m))).build().getActualMaximum(Calendar.DATE);
+			for(int i = 0; i < max; ++i)
+				day[id].addItem((i+1) + "日");		
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void setScheduledTime(String text, GridBagLayout layout, GridBagConstraints gbc) {
+		gbc.gridx = 0;
+		JLabel name = new JLabel(text);
+		layout.setConstraints(name, gbc);
+		add(name);
+		
+		gbc.gridx = 1;
+		SpinnerNumberModel model = new SpinnerNumberModel(1.0, 0.0, 10000, 1);
+		scheduledHour = new JSpinner(model);
+		layout.setConstraints(scheduledHour, gbc);
+		add(scheduledHour);
 		
 		gbc.gridx = 2;
-		box = new JComboBox<String>();
-		for(int i = 0; i < date.getActualMaximum(Calendar.DATE); ++i)
-			box.addItem((i+1) + "日");
-		box.setSelectedIndex(date.get(Calendar.DAY_OF_MONTH) - 1);
-		layout.setConstraints(box, gbc);
-		add(box);
+		JLabel hour = new JLabel("時間");
+		layout.setConstraints(hour, gbc);
+		add(hour);
+
+		gbc.gridx = 3;
+		model = new SpinnerNumberModel(0.0, 0.0, 60.0, 1.0);
+		scheduledMin = new JSpinner(model);
+		layout.setConstraints(scheduledMin, gbc);
+		add(scheduledMin);
+
+		gbc.gridx = 4;
+		JLabel min = new JLabel("分");
+		layout.setConstraints(min, gbc);
+		add(min);
 	}
 	
 	private void setWeight(String text, GridBagLayout layout, GridBagConstraints gbc) {
@@ -193,9 +285,9 @@ public class ConfigDialog extends JDialog {
 		
 		gbc.gridx = 1;
 		SpinnerNumberModel model = new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1);
-		JSpinner spinner = new JSpinner(model);
-		layout.setConstraints(spinner, gbc);
-		add(spinner);
+		weight = new JSpinner(model);
+		layout.setConstraints(weight, gbc);
+		add(weight);
 	}
 	
 	private void addTag() {
@@ -212,5 +304,27 @@ public class ConfigDialog extends JDialog {
 		tags.add(label);
 		tagName.setText("");
 		pack();
+	}
+	
+	private void createTask() {
+		// タスク名空白は使えない
+		if(taskName.getText().equals(""))
+			return;
+		ArrayList<Tag> taglist = new ArrayList<Tag>();
+		for(Component c : tags.getComponents()) 
+			if(c instanceof JLabel)
+				taglist.add(new Tag(((JLabel)c).getText()));
+		try {
+			Date start = new SimpleDateFormat("yyyy年M月d日").parse(year[0].getSelectedItem().toString() + month[0].getSelectedItem().toString() + day[0].getSelectedItem().toString());
+			Date limit = new SimpleDateFormat("yyyy年M月d日").parse(year[1].getSelectedItem().toString() + month[1].getSelectedItem().toString() + day[1].getSelectedItem().toString());
+			Time time = new Time(new SimpleDateFormat("H m").parse(((Double)scheduledHour.getValue()).intValue() + " " + ((Double)scheduledMin.getValue()).intValue()).getTime());			
+			
+			Task task = new Task(taskName.getText(), taglist, start, limit, explanation.getText(), time, 0);
+			TaskManager.instance().addTask(task);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }
