@@ -123,4 +123,9 @@ public class Task implements Serializable {
 	public void addTime(Time t) {
 		elapsedTime.setTime(elapsedTime.getTime() + t.getTime());
 	}
+	
+	@Override
+	public String toString() {
+		return "Name : " + name + ", ID : " + ID + ", Start : " + start.toString() + ", Limit : " + limit.toString();
+	}
 }

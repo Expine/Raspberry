@@ -28,8 +28,8 @@ public class TodayPanel extends JPanel {
 		panel.add(label);
 		add(panel);
 
-		Task t1 = new Task("Name", new ArrayList<Tag>(), calendar.getTime(), new Date(calendar.getTimeInMillis() + 10000L), "Exp", new Time(2000), 0);
-		TaskManager.instance().addTask(t1);
+//		Task t1 = new Task("Name", new ArrayList<Tag>(), calendar.getTime(), new Date(calendar.getTimeInMillis() + 10000L), "Exp", new Time(2000), 0);
+//		TaskManager.instance().addTask(t1);
 
 		for(Task t : TaskManager.instance().getTask(Calendar.getInstance().getTime())) {
 			System.out.print(t);

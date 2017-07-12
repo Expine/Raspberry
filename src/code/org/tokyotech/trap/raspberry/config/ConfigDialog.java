@@ -30,6 +30,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import code.org.tokyotech.trap.raspberry.main.CalendarPanel;
 import code.org.tokyotech.trap.raspberry.task.Tag;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
@@ -43,7 +44,8 @@ import code.org.tokyotech.trap.raspberry.task.TaskManager;
 public class ConfigDialog extends JDialog {
 	/** 単一のダイアログを表示するためのインスタンス */
 	private static ConfigDialog instance = null;
-	
+
+	private CalendarPanel cpanel;
 	private JComboBox<String>[] year = new JComboBox[2];
 	private JComboBox<String>[] month = new JComboBox[2];
 	private JComboBox<String>[] day = new JComboBox[2];
@@ -54,9 +56,9 @@ public class ConfigDialog extends JDialog {
 	private JTextArea explanation;
 	private JPanel tags = new JPanel();
 	
-	public ConfigDialog(JFrame owner, Calendar date, int x, int y) {
+	public ConfigDialog(CalendarPanel cpanel, JFrame owner, Calendar date, int x, int y) {
 		super(owner);
-
+		
 		// 既に表示済みの場合は何もしない
 		if(instance != null) {
 			dispose();
@@ -64,6 +66,7 @@ public class ConfigDialog extends JDialog {
 		}
 		instance = this;
 		
+		this.cpanel = cpanel;
 		tags.setLayout(new FlowLayout());
 
         // レイアウトを設定
@@ -315,10 +318,10 @@ public class ConfigDialog extends JDialog {
 			if(c instanceof JLabel)
 				taglist.add(new Tag(((JLabel)c).getText()));
 		try {
-			Date start = new SimpleDateFormat("yyyy年M月d日").parse(year[0].getSelectedItem().toString() + month[0].getSelectedItem().toString() + day[0].getSelectedItem().toString());
-			Date limit = new SimpleDateFormat("yyyy年M月d日").parse(year[1].getSelectedItem().toString() + month[1].getSelectedItem().toString() + day[1].getSelectedItem().toString());
+			Date start = new SimpleDateFormat("yyyy年M月d日H m").parse(year[0].getSelectedItem().toString() + month[0].getSelectedItem().toString() + day[0].getSelectedItem().toString() + "0 0");
+			Date limit = new SimpleDateFormat("yyyy年M月d日H m").parse(year[1].getSelectedItem().toString() + month[1].getSelectedItem().toString() + day[1].getSelectedItem().toString() + "23 59");
 			Time time = new Time(new SimpleDateFormat("H m").parse(((Double)scheduledHour.getValue()).intValue() + " " + ((Double)scheduledMin.getValue()).intValue()).getTime());			
-			
+
 			Task task = new Task(taskName.getText(), taglist, start, limit, explanation.getText(), time, 0);
 			TaskManager.instance().addTask(task);
 		} catch (ParseException e) {
@@ -326,5 +329,14 @@ public class ConfigDialog extends JDialog {
 			e.printStackTrace();
 		}
 		
+		cpanel.reflesh();
+		
+		dispose();
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		instance = null;
 	}
 }

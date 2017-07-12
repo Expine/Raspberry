@@ -1,12 +1,17 @@
 package code.org.tokyotech.trap.raspberry.task;
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,11 +33,9 @@ public class TaskManager {
 	private ArrayList<Tag> tagList = new ArrayList<Tag>();
 	
 	private TaskManager(){
-//		loadTaskData();
-		for(int i = 0; i < 10; ++i) {
-			Task t = new Task("Name" + i, new ArrayList<Tag>(), new Date(1000), new Date(2000), "Exp" + i, new Time(2000), 0);
-			tasks.put(t.getID(), t);
-		}
+		loadTaskData();
+		
+		printTasks();
 	}
 	
 	/**
@@ -45,6 +48,13 @@ public class TaskManager {
 
 		String line = null;
 		try {
+			if(new File("./config/.config").exists()) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("./config/.config")));
+				while((line = br.readLine()) != null) {
+					
+					Task.startID = Integer.parseInt(line);
+				}
+			}
 			if(new File("./config/.task").exists()) {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./config/.task"));
 				tasks = (HashMap<Integer, Task>)ois.readObject();		
@@ -76,6 +86,9 @@ public class TaskManager {
 			new File("./config").mkdirs();
 
 		try {
+			PrintWriter pw = new PrintWriter(new FileOutputStream("./config/.config"));
+			pw.write(Task.startID + "");
+			pw.close();
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./config/.task"));
 			oos.writeObject(tasks);
 			oos.close();
@@ -270,5 +283,14 @@ public class TaskManager {
 			this.task = task;
 			this.weight = weight;
 		}		
+	}
+	
+	/**
+	 * 保持しているタスクを標準出力に出力
+	 */
+	private void printTasks() {
+		tasks.values().forEach(it -> System.out.println("Task -> " + it.toString()));
+		closeTasks.values().forEach(it -> System.out.println("Closed Task -> " + it.toString()));
+		tagList.forEach(it -> System.out.println("Tag list -> " + it.toString()));
 	}
 }
