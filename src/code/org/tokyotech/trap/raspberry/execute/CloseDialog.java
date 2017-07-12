@@ -14,47 +14,62 @@ import code.org.tokyotech.trap.raspberry.task.TaskManager;
  * @author kakuo
  * @param task 閉じるタスク
  */
-public class CloseDialog extends JDialog implements ActionListener{
+public class CloseDialog extends JDialog {
 
 	private CardLayout layout;
 	private JPanel mainPanel;
-	private Task task;
-	private JDialog parent;
+
 
 
 	public CloseDialog(JDialog parent, Task task){
 
 		super(parent);
-		this.parent=parent;
-		this.task=task;
+		
 		mainPanel=new JPanel(new CardLayout());
 
 		JPanel askPanel=new JPanel();
+		
 		JButton ask_YesButton=new JButton("はい");
+		ask_YesButton.addActionListener(new ActionListener(){					//押されたらタスクをクローズ、または警告
+			@Override public void actionPerformed(ActionEvent e){try_closetask(task);}});
+		
 		JButton ask_NoButton=new JButton("いいえ");
+		ask_NoButton.addActionListener(new ActionListener(){					//押されたらダイアログを閉じる
+			@Override public void actionPerformed(ActionEvent e){dispose();}});
+		
 		JLabel askLabel=new JLabel("このタスクを閉じてよろしいですか？");
+		askPanel.add(askLabel);
 		askPanel.add(ask_YesButton);
 		askPanel.add(ask_NoButton);
-		askPanel.add(askLabel);
-		setButton(ask_YesButton,"try_closetask");
-		setButton(ask_NoButton,"return");
+		
+		
 
 		JPanel warningPanel=new JPanel();
+		
 		JButton warning_YesButton=new JButton("はい");
+		warning_YesButton.addActionListener(new ActionListener(){					//押されたらタスクを（強制的に）クローズ
+			@Override public void actionPerformed(ActionEvent e){closetask(task);}});
+		
 		JButton warning_NoButton=new JButton("いいえ");
-		JLabel warningLabel=new JLabel("作業時間が予想時間を大幅に下回っています。/n本当にタスクを完了しましたか？");
+		warning_NoButton.addActionListener(new ActionListener(){					//押されたらダイアログを閉じる
+			@Override public void actionPerformed(ActionEvent e){dispose();}});
+		
+		JLabel warningLabel=new JLabel("作業時間が予想時間を下回っています。\n本当にタスクを完了しましたか？");
+		warningPanel.add(warningLabel);
 		warningPanel.add(warning_YesButton);
 		warningPanel.add(warning_NoButton);
-		warningPanel.add(warningLabel);
-		setButton(warning_YesButton,"closetask");
-		setButton(warning_NoButton,"return");
+		
+		
 
 		JPanel closedPanel=new JPanel();
 		JButton okButton=new JButton("OK");
+		okButton.addActionListener(new ActionListener(){					//押されたらダイアログを閉じる
+			@Override public void actionPerformed(ActionEvent e){dispose();}});
+		
 		JLabel closedLabel=new JLabel("タスクを閉じました。");
 		closedPanel.add(closedLabel);
 		closedPanel.add(okButton);
-		setButton(okButton,"return");
+	
 
 		mainPanel.add(askPanel,"ask");
 		mainPanel.add(warningPanel,"warning");
@@ -63,32 +78,25 @@ public class CloseDialog extends JDialog implements ActionListener{
 		getContentPane().add(mainPanel);
 		layout=(CardLayout)mainPanel.getLayout();
 
-		setSize(500,300);
+		setSize(700,300);
 		setLocationRelativeTo(null);
 		setModal(true);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
-  	public void actionPerformed(ActionEvent e){
-		String cmd=e.getActionCommand();
+  
 
-		if(cmd=="try_closetask"){
+  	private void try_closetask(Task task){						//作業時間が予測時間を下回っていれば警告画面、そうでなければタスクをクローズ
 			if(task.getElapsedTime().getTime()<task.getScheduledTime().getTime() )
 			  layout.show(mainPanel,"warning");
-			else {layout.show(mainPanel, "closed"); TaskManager.instance().closeTask(task.getID());}
-
-		}
-
-		if(cmd=="return")   parent.dispose();
-
-		if(cmd=="closetask"){layout.show(mainPanel, "closed"); TaskManager.instance().closeTask(task.getID()); }
-
-	}
-
-  	private void setButton(JButton button,String command){
-		button.addActionListener(this);
-		button.setActionCommand(command);
-	}
-
+			else {closetask(task);}
+  	}
+  	
+  	
+  	private void closetask(Task task){								//タスクをクローズ					
+  		layout.show(mainPanel, "closed"); TaskManager.instance().closeTask(task.getID());
+  	}
+  	
+  
 }
