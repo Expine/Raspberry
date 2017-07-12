@@ -6,8 +6,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Time;
+
 import javax.swing.*;
 import code.org.tokyotech.trap.raspberry.task.Task;
+import code.org.tokyotech.trap.raspberry.task.TaskManager;
 
 /**
  * タスク実行のダイアログ
@@ -15,30 +18,28 @@ import code.org.tokyotech.trap.raspberry.task.Task;
  * @param task 実行するタスク
  */
 
-public class ExecuteDialog extends JDialog implements ActionListener {
+public class ExecuteDialog extends JDialog {
 
+	private ImageIcon[] runOrStopImage = new ImageIcon[2];
 	private JLabel image;
 	private JButton runOrStop;
-	private JLabel working;
-	private JLabel rest;
-
-	private int worktime=0;      //進捗時間
-	private String workTimeText="0時間0分0秒";
-	private JLabel workTimeLabel_working;
-	private JLabel workTimeLabel_rest;
-	private JLabel workTimeLabel_finish;
-	private CardLayout layout;
-	private JPanel mainPanel;
+	private JLabel timeLabel;
 	private Timer timer;
 	private Task task;
-
-
+	private int restTime = 0;
+	private int workTime = 0;
+	
 	public ExecuteDialog(Task task){
 		 this.task=task;
 
 		 GridBagLayout layout = new GridBagLayout();
 		 GridBagConstraints gbc = new GridBagConstraints();
 		 setLayout(layout);
+		 
+		 timer = new Timer(1000, e -> { if(isStop()) restTime++; else workTime++; refleshTimeLabel(); });
+		 timer.start();
+		 runOrStopImage[0] = new ImageIcon(getClass().getClassLoader().getResource("res/run.png"));
+		 runOrStopImage[1] = new ImageIcon(getClass().getClassLoader().getResource("res/stop.png"));
 			
 		 
 		 gbc.fill = GridBagConstraints.BOTH;
@@ -51,10 +52,11 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		 image = new JLabel();
 		 layout.setConstraints(image, gbc);
 		 add(image);
-		 setImage();
 		 
 		 gbc.gridx = 3;
-		 runOrStop = new JButton("一時停止");
+		 gbc.gridwidth = 1;
+		 gbc.gridheight = 1;
+		 runOrStop = new JButton("再開");
 		 runOrStop.addActionListener(e -> { runOrStop(); });
 		 layout.setConstraints(runOrStop, gbc);
 		 add(runOrStop);		 
@@ -66,15 +68,15 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		 add(end);
 
 		 gbc.gridy++;
+		 timeLabel = new JLabel();
+		 layout.setConstraints(timeLabel, gbc);
+		 add(timeLabel);		 
 		 
-		 
-
-		 gbc.gridy++;
-		 
-		 
+		 setImage();
+		 refleshTimeLabel();
 		 pack();
 		 
-		 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		 setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		 setLocationRelativeTo(null);
 		 setModal(true);
 		 setVisible(true);
@@ -82,57 +84,41 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 	}
 	
 	private void runOrStop() {
-		if(runOrStop.getText().equals("再開")) 
+		/*
+		if(isStop()) 
 			timer.start();
 		else
 			timer.stop();
+		*/
 		setImage();
 		
 	}
 	
 	private void setImage() {
-		if(runOrStop.getText().equals("再開")) {
-			image.setIcon(new ImageIcon(getClass().getClassLoader().getResource("res/run.png")));
-			runOrStop.setText("再開");
-		} else {
-			image.setIcon(new ImageIcon(getClass().getClassLoader().getResource("res/stop.png")));
+		if(isStop()) {
+			image.setIcon(runOrStopImage[0]);
 			runOrStop.setText("一時停止");
+		} else {
+			image.setIcon(runOrStopImage[1]);
+			runOrStop.setText("再開");
 		}
-		
+		repaint();
 	}
 	
 	private void endTask() {
-		
+		TaskManager.instance().progress(task.getID(), new Time(1000 * workTime));
+		dispose();
 	}
-
-	public void actionPerformed(ActionEvent e){
-		String cmd=e.getActionCommand();
-
-		if(cmd=="startworking"){layout.show(mainPanel, "working"); timer.start();}
-
-		if(cmd=="close") 	{new CloseDialog(this, task); }
-
-
-		if(cmd=="rest")
-		{timer.stop();
-		layout.show(mainPanel, "rest");
-		workTimeLabel_rest.setText("作業時間:"+workTimeText);}
-
-		if(cmd=="restart")	{timer.start(); layout.show(mainPanel, "working");}
-
-		if(cmd=="finishworking")
-		{timer.stop();
-		 layout.show(mainPanel, "finish");
-		 workTimeLabel_finish.setText("今回の作業時間:"+workTimeText);
-		// TaskManager.instance().progress(task.getID(),new Time(1000*worktime));
-		 }
-
-		if(cmd=="return") {dispose();}
-
-		if(cmd=="timer")
-		{ worktime++;
-		  workTimeText=worktime/3600+"時間"+ (worktime%3600)/60+"分"+worktime%60+"秒";
-		  workTimeLabel_working.setText("作業時間:"+workTimeText);}
-
+	
+	private void refleshTimeLabel() {
+		if(isStop())
+			timeLabel.setText("休憩時間 : " + restTime / 3600 + "時間"+ (restTime % 3600) / 60+"分" + restTime % 60 + "秒");
+		else
+			timeLabel.setText("作業時間 : " + workTime / 3600 + "時間"+ (workTime % 3600) / 60+"分" + workTime % 60 + "秒");
+		repaint();
+	}
+	
+	private boolean isStop() {
+		return runOrStop.getText().equals("再開");
 	}
 }
