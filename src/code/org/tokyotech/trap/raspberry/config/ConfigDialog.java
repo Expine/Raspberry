@@ -172,6 +172,14 @@ public class ConfigDialog extends JDialog {
 		setVisible(true);
 	}
 	
+	/**
+	 * テキストフィールドを題名付きで設置
+	 * @param text 題名
+	 * @param layout レイアウト
+	 * @param gbc レイアウト管理
+	 * @param width テキストフィールドの大きさ
+	 * @return 生成したテキストフィールド
+	 */
 	private JTextField setTextWithLabel(String text, GridBagLayout layout, GridBagConstraints gbc, int width) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
@@ -189,6 +197,14 @@ public class ConfigDialog extends JDialog {
 		return nameText;
 	}
 
+	/**
+	 * テキストエリアを題名付きで設置
+	 * @param text 題名
+	 * @param layout レイアウト
+	 * @param gbc レイアウト管理
+	 * @param width テキストエリアドの大きさ
+	 * @return 生成したテキストエリア
+	 */
 	private JTextArea setTextAreaWithLabel(String text, GridBagLayout layout, GridBagConstraints gbc, int width) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
@@ -207,6 +223,14 @@ public class ConfigDialog extends JDialog {
 		return nameText;
 	}
 
+	/**
+	 * 日付を設定
+	 * @param text 日付の題名
+	 * @param date 設定する日付
+	 * @param layout レイアウト
+	 * @param gbc レイアウト管理
+	 * @param id 設定する種別
+	 */
 	private void setDate(String text, Calendar date, GridBagLayout layout, GridBagConstraints gbc, int id) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
@@ -239,6 +263,11 @@ public class ConfigDialog extends JDialog {
 		add(day[id]);
 	}
 	
+	/**
+	 * 日付をリフレッシュする
+	 * 月及び年に応じた日付を設定する
+	 * @param id リフレッシュする日付番号
+	 */
 	private void refleshDay(int id) {
 		String y = year[id].getSelectedItem().toString();
 		String m = month[id].getSelectedItem().toString();
@@ -251,7 +280,13 @@ public class ConfigDialog extends JDialog {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * 予想時間を設定する
+	 * @param text 予想時間の題名
+	 * @param layout レイアウト
+	 * @param gbc レイアウト管理
+	 */
 	private void setScheduledTime(String text, GridBagLayout layout, GridBagConstraints gbc) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
@@ -281,6 +316,12 @@ public class ConfigDialog extends JDialog {
 		add(min);
 	}
 	
+	/**
+	 * 重みを設定
+	 * @param text 重みの題名
+	 * @param layout レイアウト
+	 * @param gbc レイアウト管理
+	 */
 	private void setWeight(String text, GridBagLayout layout, GridBagConstraints gbc) {
 		gbc.gridx = 0;
 		JLabel name = new JLabel(text);
@@ -294,6 +335,9 @@ public class ConfigDialog extends JDialog {
 		add(weight);
 	}
 	
+	/**
+	 * タグを追加する
+	 */
 	private void addTag() {
 		String text = tagName.getText();
 		// 空白は却下
@@ -310,6 +354,9 @@ public class ConfigDialog extends JDialog {
 		pack();
 	}
 	
+	/**
+	 * タスクを生成する
+	 */
 	private void createTask() {
 		// タスク名空白は使えない
 		if(taskName.getText().equals(""))
@@ -338,6 +385,7 @@ public class ConfigDialog extends JDialog {
 	@Override
 	public void dispose() {
 		super.dispose();
+		// 破壊時は、きっちりインスタンスもクリアする
 		instance = null;
 	}
 }

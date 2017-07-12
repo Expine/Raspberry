@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import code.org.tokyotech.trap.raspberry.execute.ExecuteDialog;
 import code.org.tokyotech.trap.raspberry.task.Tag;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
@@ -72,11 +73,13 @@ public class TodayPanel extends JPanel {
 			gbc.gridy = 1;
 			gbc.gridwidth = 1;
 			JButton run = new JButton("実行");
+			run.addActionListener(e -> { new ExecuteDialog(t); owner.reflesh(); });
 			layout.setConstraints(run, gbc);
 			task.add(run);
 			
 			gbc.gridx = 1;
 			JButton close = new JButton("閉じる");
+			close.addActionListener(e -> { TaskManager.instance().closeTask(t.getID()); owner.reflesh(); });
 			layout.setConstraints(close, gbc);
 			task.add(close);
 			
@@ -86,6 +89,8 @@ public class TodayPanel extends JPanel {
 	
 	public void reflesh() {
 		setTasks();
+		owner.pack();				
+		owner.repaint();		
 	}
 
 }

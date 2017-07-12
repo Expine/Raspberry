@@ -190,7 +190,7 @@ public class TaskManager {
 	 */
 	public void closeTask(int ID) {
 		Task task = tasks.get(ID);
-		tasks.remove(task);
+		tasks.remove(ID);
 		closeTasks.put(task.getID(), task);
 	}
 
@@ -201,7 +201,7 @@ public class TaskManager {
 	public Time getEstimatedTime(ArrayList<Tag> tags) {
 		long result = 0L;
 		for(Tag t : tags)
-			result += calculateTime(t).getTime();
+			result += calculateTime(t).getTime(); 
 		return new Time(tags.size() == 0 ? 0 : result / tags.size());
 	}	
 	
