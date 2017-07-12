@@ -1,6 +1,9 @@
 package code.org.tokyotech.trap.raspberry.execute;
 
 import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -14,6 +17,10 @@ import code.org.tokyotech.trap.raspberry.task.Task;
 
 public class ExecuteDialog extends JDialog implements ActionListener {
 
+	private JLabel image;
+	private JButton runOrStop;
+	private JLabel working;
+	private JLabel rest;
 
 	private int worktime=0;      //進捗時間
 	private String workTimeText="0時間0分0秒";
@@ -27,68 +34,75 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 
 
 	public ExecuteDialog(Task task){
-
-
 		 this.task=task;
-		 mainPanel=new JPanel(new CardLayout());
-		 timer=new Timer(1000,this);
-		 timer.setActionCommand("timer");
 
+		 GridBagLayout layout = new GridBagLayout();
+		 GridBagConstraints gbc = new GridBagConstraints();
+		 setLayout(layout);
+			
+		 
+		 gbc.fill = GridBagConstraints.BOTH;
+		 gbc.insets = new Insets(5, 5, 5, 5);
+		 
+		 gbc.gridx = 0;
+		 gbc.gridy = 0;
+		 gbc.gridwidth = 2;
+		 gbc.gridheight = 4;
+		 image = new JLabel();
+		 layout.setConstraints(image, gbc);
+		 add(image);
+		 setImage();
+		 
+		 gbc.gridx = 3;
+		 runOrStop = new JButton("一時停止");
+		 runOrStop.addActionListener(e -> { runOrStop(); });
+		 layout.setConstraints(runOrStop, gbc);
+		 add(runOrStop);		 
+		 
+		 gbc.gridy++;
+		 JButton end = new JButton("終了");
+		 end.addActionListener(e -> { endTask(); });
+		 layout.setConstraints(end, gbc);
+		 add(end);
 
-		JPanel selectPanel=new JPanel();                      //選択画面
-		JButton startWorkButton=new JButton("タスクを始める");
-		JButton closeButton=new JButton("タスクを閉じる");
-		JButton returnButton=new JButton("戻る");
-		selectPanel.add(returnButton);
-		selectPanel.add(startWorkButton);
-		selectPanel.add(closeButton);
-		setButton(startWorkButton,"startworking");
-		setButton(closeButton,"close");
-		setButton(returnButton,"return");
+		 gbc.gridy++;
+		 
+		 
 
+		 gbc.gridy++;
+		 
+		 
+		 pack();
+		 
+		 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		 setLocationRelativeTo(null);
+		 setModal(true);
+		 setVisible(true);
 
-
-		JPanel workingPanel=new JPanel();		   //作業中画面
-		JButton finishButton=new JButton("終了");
-		JButton restButton=new JButton("中断");
-		workTimeLabel_working=new JLabel("作業時間:"+workTimeText);
-		workingPanel.add(workTimeLabel_working);
-		workingPanel.add(finishButton);
-		workingPanel.add(restButton);
-		setButton(finishButton,"finishworking");
-		setButton(restButton,"rest");
-
-
-		JPanel restPanel=new JPanel();				//中断画面
-		JButton restartButton=new JButton("再開");
-		workTimeLabel_rest=new JLabel("作業時間:"+workTimeText);
-		restPanel.add(workTimeLabel_rest);
-		restPanel.add(restartButton);
-		setButton(restartButton,"restart");
-
-
-		JPanel finishPanel=new JPanel();			   //終了画面
-		JButton okButton=new JButton("OK");
-		workTimeLabel_finish=new JLabel("今回の作業時間:"+workTimeText);
-		setButton(okButton,"return");
-		finishPanel.add(workTimeLabel_finish);
-		finishPanel.add(okButton);
-
-
-		mainPanel.add(selectPanel,"select");
-		mainPanel.add(workingPanel,"working");
-		mainPanel.add(restPanel,"rest");
-		mainPanel.add(finishPanel,"finish");
-
-		getContentPane().add(mainPanel);
-		layout=(CardLayout)mainPanel.getLayout();
-
-		setSize(500,300);
-		setLocationRelativeTo(null);
-		setModal(true);
-		setVisible(true);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+	}
+	
+	private void runOrStop() {
+		if(runOrStop.getText().equals("再開")) 
+			timer.start();
+		else
+			timer.stop();
+		setImage();
+		
+	}
+	
+	private void setImage() {
+		if(runOrStop.getText().equals("再開")) {
+			image.setIcon(new ImageIcon(getClass().getClassLoader().getResource("res/run.png")));
+			runOrStop.setText("再開");
+		} else {
+			image.setIcon(new ImageIcon(getClass().getClassLoader().getResource("res/stop.png")));
+			runOrStop.setText("一時停止");
+		}
+		
+	}
+	
+	private void endTask() {
+		
 	}
 
 	public void actionPerformed(ActionEvent e){
@@ -121,10 +135,4 @@ public class ExecuteDialog extends JDialog implements ActionListener {
 		  workTimeLabel_working.setText("作業時間:"+workTimeText);}
 
 	}
-
-	private void setButton(JButton button,String command){
-		button.addActionListener(this);
-		button.setActionCommand(command);
-	}
-
 }
