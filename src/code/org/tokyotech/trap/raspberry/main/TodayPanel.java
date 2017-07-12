@@ -10,7 +10,6 @@ import java.util.Date;
 import code.org.tokyotech.trap.raspberry.task.Tag;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
-import com.sun.prism.j2d.print.J2DPrinterJob;
 
 public class TodayPanel extends JPanel {
 
