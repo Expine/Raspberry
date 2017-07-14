@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -74,6 +76,8 @@ public class TaskManager {
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		checkTask();
 	}
 	
 	/**
@@ -268,6 +272,17 @@ public class TaskManager {
 			}
 		return table[str1.length][str2.length];
 	}	
+	
+	/**
+	 * 期限切れのタスクを確認する
+	 */
+	private void checkTask() {
+		Date today = Calendar.getInstance().getTime();
+		Task[] ts = tasks.values().toArray(new Task[0]);
+		for(int i = ts.length - 1; 0 <= i ; --i  )
+			if(ts[i].getLimit().before(today))
+				closeTask(ts[i].getID());
+	}
 	
 	/**
 	 * タスクに重みを付けたデータクラス
