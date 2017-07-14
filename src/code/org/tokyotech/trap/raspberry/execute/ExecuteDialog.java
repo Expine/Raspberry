@@ -1,5 +1,6 @@
 package code.org.tokyotech.trap.raspberry.execute;
 
+import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -11,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.sql.Time;
 
 import javax.swing.*;
+
+import code.org.tokyotech.trap.raspberry.audio.AudioManager;
 import code.org.tokyotech.trap.raspberry.task.Task;
 import code.org.tokyotech.trap.raspberry.task.TaskManager;
 
@@ -26,13 +29,16 @@ public class ExecuteDialog extends JDialog {
 	private JLabel image;
 	private JButton runOrStop;
 	private JLabel timeLabel;
+	private JCheckBox check;
 	private Timer timer;
 	private Task task;
+	private int checkTime = 0;
 	private int restTime = 0;
 	private int workTime = 0;
 	
 	public ExecuteDialog(Task task){
 		 this.task=task;
+		 KeyManager.reset();
 
 		 GridBagLayout layout = new GridBagLayout();
 		 GridBagConstraints gbc = new GridBagConstraints();
@@ -73,7 +79,12 @@ public class ExecuteDialog extends JDialog {
 		 timeLabel = new JLabel();
 		 layout.setConstraints(timeLabel, gbc);
 		 add(timeLabel);		 
-		 
+
+		 gbc.gridy++;
+		 check = new JCheckBox("しばらくPCを使わない");
+		 layout.setConstraints(check, gbc);
+		 add(check);
+
 		 setImage();
 		 refleshTimeLabel();
 		 pack();
@@ -83,10 +94,11 @@ public class ExecuteDialog extends JDialog {
 		 setModal(true);
 		 setVisible(true);
 		 
-		 KeyManager.reset();
-
 	}
 	
+	/**
+	 * 実行、あるいは止める
+	 */
 	private void runOrStop() {
 		/*
 		if(isStop()) 
@@ -98,6 +110,9 @@ public class ExecuteDialog extends JDialog {
 		
 	}
 	
+	/**
+	 * タスク実行中画面の画像を変更する
+	 */
 	private void setImage() {
 		if(isStop()) {
 			image.setIcon(runOrStopImage[0]);
@@ -108,32 +123,56 @@ public class ExecuteDialog extends JDialog {
 		}
 		repaint();
 	}
-	
+
+	/**
+	 * タスクを終える
+	 */
 	private void endTask() {
 		TaskManager.instance().progress(task.getID(), new Time(1000 * workTime));
 		timer.stop();
 		dispose();
 	}
 	
+	/**
+	 * 実行中の時間を更新する
+	 */
 	private void refleshTimeLabel() {
-		System.out.println(KeyManager.getElapsedTime());
-		if(KeyManager.getElapsedTime() > 60L * 1000000000L) {
-			JOptionPane jop = new JOptionPane("進捗どうですか？", JOptionPane.ERROR_MESSAGE);
-			JDialog dialog = jop.createDialog(null, "進捗確認");
-			dialog.setAlwaysOnTop(true);
-			dialog.setVisible(true);
-			dialog.setAlwaysOnTop(false);
-			KeyManager.reset();
-		}
+		if(!isStop() && KeyManager.getElapsedTime() > 5L * 1000000000L)
+			if(check.isSelected())
+				KeyManager.reset();
+			else
+				showDialog("進捗どうですか？", "進捗確認");
 		
-		if(isStop())
+		if(isStop()) {
 			timeLabel.setText("休憩時間 : " + restTime / 3600 + "時間"+ (restTime % 3600) / 60+"分" + restTime % 60 + "秒");
-		else
+			if(restTime > checkTime + 3 ) {
+				showDialog("休憩がずいぶん長いですね", "休憩確認");
+				checkTime = restTime;
+			}
+		} else
 			timeLabel.setText("作業時間 : " + workTime / 3600 + "時間"+ (workTime % 3600) / 60+"分" + workTime % 60 + "秒");
 		repaint();
 	}
 	
+	/**
+	 * 停止中かを判定
+	 * @return 停止中であるか
+	 */
 	private boolean isStop() {
 		return runOrStop.getText().equals("再開");
+	}
+	
+	/**
+	 * 警告を出す
+	 */
+	private void showDialog(String mes, String title) {
+		AudioManager.playSound();
+		JOptionPane jop = new JOptionPane(mes, JOptionPane.ERROR_MESSAGE);
+		JDialog dialog = jop.createDialog(null, title);
+		dialog.setAlwaysOnTop(true);
+		dialog.setVisible(true);
+		dialog.setAlwaysOnTop(false);
+		KeyManager.reset();
+		AudioManager.stop();		
 	}
 }

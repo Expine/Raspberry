@@ -106,7 +106,7 @@ public class TodayPanel extends JPanel {
 			layout.setConstraints(exp_s, gbc);
 			task.add(exp_s);
 			
-						tasks.add(task);
+			tasks.add(task);
 		}		
 	}
 	
