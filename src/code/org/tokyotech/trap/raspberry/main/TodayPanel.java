@@ -2,6 +2,7 @@ package code.org.tokyotech.trap.raspberry.main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -66,7 +67,7 @@ public class TodayPanel extends JPanel {
 
 			gbc.gridx = 1;
 			gbc.gridwidth = 1;
-			JLabel proctime = new JLabel(new SimpleDateFormat("H時間m分s秒").format(t.getElapsedTime()));
+			JLabel proctime = new JLabel(new SimpleDateFormat("H時間m分s秒").format(new Time(t.getElapsedTime().getTime() + 15 * 60 * 60 * 1000L)));
 			layout.setConstraints(proctime, gbc);
 			task.add(proctime);
 
@@ -92,7 +93,10 @@ public class TodayPanel extends JPanel {
 			
 			gbc.gridx = 1;
 			JButton close = new JButton("閉じる");
-			close.addActionListener(e -> { TaskManager.instance().closeTask(t.getID()); owner.reflesh(); });
+			close.addActionListener(e -> { 
+				if(closeCheck(t))
+					TaskManager.instance().closeTask(t.getID()); owner.reflesh(); 
+			});
 			layout.setConstraints(close, gbc);
 			task.add(close);
 
@@ -115,5 +119,26 @@ public class TodayPanel extends JPanel {
 		owner.pack();				
 		owner.repaint();		
 	}
+	
+	/**
+	 * 閉じることができるかを判定
+	 * @param t 判定するタスク
+	 * @return
+	 */
+	private boolean closeCheck(Task t) {
+		switch(JOptionPane.showConfirmDialog(this, "このタスクを閉じますか？")) {
+		case JOptionPane.YES_OPTION :
+			if(t.getElapsedTime().getTime() < t.getScheduledTime().getTime() - 15 * 60 * 60 * 1000L)
+				switch(JOptionPane.showConfirmDialog(this, "予想より早いですが本当に終わりましたか？")) {
+					case JOptionPane.YES_OPTION :
+						return true;
+					default:
+						return false;
+				}
+			return true;
+		default:
+			return false;
+		}
+ 	}
 
 }

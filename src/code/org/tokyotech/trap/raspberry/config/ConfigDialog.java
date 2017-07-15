@@ -52,6 +52,7 @@ public class ConfigDialog extends JDialog {
 	private JComboBox<String>[] day = new JComboBox[2];
 	private JTextField taskName;
 	private JTextField tagName;
+	private JTextField estimateTime;
 	private JSpinner scheduledHour, scheduledMin;
 	private JSpinner weight;
 	private JTextArea explanation;
@@ -116,6 +117,18 @@ public class ConfigDialog extends JDialog {
 		tags_s.setPreferredSize(new Dimension(280, 60));
 		layout.setConstraints(tags_s, gbc);
 		add(tags_s);
+		
+		gbc.gridx = 0;
+		gbc.gridy++;
+		gbc.gridwidth = 2;
+		JLabel estimate = new JLabel("タグから推測される予想時間");
+		layout.setConstraints(estimate, gbc);
+		add(estimate);
+		gbc.gridx = 2;
+		estimateTime = new JTextField();
+		estimateTime.setEditable(false);
+		layout.setConstraints(estimateTime, gbc);
+		add(estimateTime);
 		
 		gbc.gridy++;
 		gbc.gridwidth = 1;
@@ -352,6 +365,13 @@ public class ConfigDialog extends JDialog {
 		tags.add(label);
 		tagName.setText("");
 		pack();
+		
+		ArrayList<Tag> ts = new ArrayList<Tag>();
+		for(Component c : tags.getComponents()) 
+			if(c instanceof JLabel)
+				ts.add(new Tag(((JLabel)c).getText()));
+		
+		estimateTime.setText(new SimpleDateFormat("H時間m分s秒").format( new Time(TaskManager.instance().getEstimatedTime(ts) + 15 * 60 * 60 * 1000L)));
 	}
 	
 	/**
@@ -368,7 +388,7 @@ public class ConfigDialog extends JDialog {
 		try {
 			Date start = new SimpleDateFormat("yyyy年M月d日H m").parse(year[0].getSelectedItem().toString() + month[0].getSelectedItem().toString() + day[0].getSelectedItem().toString() + "0 0");
 			Date limit = new SimpleDateFormat("yyyy年M月d日H m").parse(year[1].getSelectedItem().toString() + month[1].getSelectedItem().toString() + day[1].getSelectedItem().toString() + "23 59");
-			Time time = new Time(new SimpleDateFormat("H m").parse(((Double)scheduledHour.getValue()).intValue() + " " + ((Double)scheduledMin.getValue()).intValue()).getTime());			
+			Time time = new Time( ((Double)scheduledHour.getValue()).intValue() * 60 * 60 * 1000L + ((Double)scheduledMin.getValue()).intValue() * 60 * 1000L + 15 * 60 * 60 * 1000L);
 
 			Task task = new Task(taskName.getText(), taglist, start, limit, explanation.getText(), time, 0);
 			TaskManager.instance().addTask(task);

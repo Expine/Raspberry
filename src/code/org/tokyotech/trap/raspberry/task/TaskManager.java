@@ -201,11 +201,11 @@ public class TaskManager {
 	 * タグからかかりそうな時間を推定する
 	 * @return 推定時間
 	 */
-	public Time getEstimatedTime(ArrayList<Tag> tags) {
+	public long getEstimatedTime(ArrayList<Tag> tags) {
 		long result = 0L;
 		for(Tag t : tags)
 			result += calculateTime(t).getTime(); 
-		return new Time(tags.size() == 0 ? 0 : result / tags.size());
+		return tags.size() == 0 ? 0 : result / tags.size();
 	}	
 	
 	/**

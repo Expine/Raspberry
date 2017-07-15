@@ -109,8 +109,12 @@ public class Task implements Serializable {
 		return checkPointExp;
 	}
 
+	/**
+	 * 経過時間を取得
+	 * @return 9時間(UNIX最初の時間)だけ引かれた経過時間
+	 */
 	public Time getElapsedTime() {
-		return elapsedTime;
+		return new Time(elapsedTime.getTime() - 15 * 60 * 60 * 1000);
 	}
 
 	public Time getScheduledTime() {
