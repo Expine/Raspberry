@@ -107,8 +107,8 @@ public class CalendarPanel extends JPanel {
     	MouseListener lis = new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
 			public void mousePressed(MouseEvent e) {
-//				new AddTaskDialog();
-				new ConfigDialog(owner, rest, e.getXOnScreen(), e.getYOnScreen());
+				if(today.before(rest))
+					new ConfigDialog(owner, rest, e.getXOnScreen(), e.getYOnScreen());					
 			}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
